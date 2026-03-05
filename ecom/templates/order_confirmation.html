@@ -1,0 +1,79 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div id="orderConfirmationModal" class="modal fade show" style="display: block;" tabindex="-1" aria-labelledby="orderConfirmationModalLabel" aria-modal="true" role="dialog">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderConfirmationModalLabel">Order Confirmation</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-4">
+                        <h3 class="font-semibold text-lg mb-2">Order Details</h3>
+                        <p><strong>Order ID:</strong> {{ order.id }}</p>
+                        <p><strong>Total Amount:</strong> ₹{{ order.total_amount|floatformat:2 }}</p>
+                        <p><strong>Date:</strong> {{ order.date|date:"F d, Y" }}</p>
+                        <p><strong>Payment Method:</strong> {{ order.get_payment_method_display }}</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h3 class="font-semibold text-lg mb-2">Order Items</h3>
+                        <ul class="list-disc pl-5">
+                            {% for item in order.orderitem_set.all %}
+                            <li>
+                                {{ item.product.name }} 
+                                ({{ item.quantity }} x ₹{{ item.subtotal|floatformat:2 }})
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="confirmOrderBtn" class="btn btn-primary">
+                        Confirm Order
+                    </button>
+                    <a href="{% url 'index' %}" class="btn btn-secondary">
+                        Cancel
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const confirmOrderBtn = document.getElementById('confirmOrderBtn');
+
+    confirmOrderBtn.addEventListener('click', function() {
+        fetch("{% url 'confirm_order' order.id %}", {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Store success in session storage rather than using messages framework
+                sessionStorage.setItem('orderSuccess', 'true');
+                sessionStorage.setItem('orderId', '{{ order.id }}');
+                
+                // Redirect to index page
+                window.location.href = "{% url 'index' %}";
+            } else {
+                alert('Error confirming order');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred');
+        });
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}

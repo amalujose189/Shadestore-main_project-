@@ -1,0 +1,253 @@
+{% extends 'main.html' %}
+
+{% block title %}{{ product.product_name }} - ShadeStore{% endblock %}
+
+{% block content %}
+<div class="container py-5 mt-5">
+    <div class="row">
+        <!-- Thumbnail Images -->
+        <div class="col-md-2 d-flex flex-column align-items-center">
+            {% if product.main_image %}
+                <img src="{{ product.main_image.url }}" alt="Thumbnail Main" class="img-thumbnail mb-2" 
+                     style="width: 80px; height: 80px; cursor: pointer;" onclick="changeImage(this.src)">
+            {% endif %}
+            {% if product.additional_image_1 %}
+                <img src="{{ product.additional_image_1.url }}" alt="Thumbnail" class="img-thumbnail mb-2" 
+                     style="width: 80px; height: 80px; cursor: pointer;" onclick="changeImage(this.src)">
+            {% endif %}
+            {% if product.additional_image_2 %}
+                <img src="{{ product.additional_image_2.url }}" alt="Thumbnail" class="img-thumbnail mb-2" 
+                     style="width: 80px; height: 80px; cursor: pointer;" onclick="changeImage(this.src)">
+            {% endif %}
+            {% if product.additional_image_3 %}
+                <img src="{{ product.additional_image_3.url }}" alt="Thumbnail" class="img-thumbnail mb-2" 
+                     style="width: 80px; height: 80px; cursor: pointer;" onclick="changeImage(this.src)">
+            {% endif %}
+        </div>
+
+        <!-- Main Image Display -->
+        <div class="col-md-4">
+            <div class="product-image-main mb-3 text-center">
+                {% if product.main_image %}
+                    <img id="mainImage" src="{{ product.main_image.url }}" alt="{{ product.product_name }}" 
+                         class="img-fluid rounded" style="max-height: 400px; transition: all 0.3s ease-in-out; cursor: pointer;" 
+                         onclick="openModal(this.src)">
+                {% else %}
+                    <div class="no-image bg-light rounded d-flex justify-content-center align-items-center" style="height: 400px;">
+                        <p class="text-muted">No image available</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Product Details -->
+        <div class="col-md-6">
+            <h1>{{ product.product_name }}</h1>
+            <p class="text-muted">Category: {{ product.category.category_name }}</p>
+            <h3 class="text-primary">₹{{ product.price }}</h3>
+            <p class="text-success">
+                {% if product.is_available %}
+                    In Stock 
+                {% else %}
+                    <span class="text-danger">Out of Stock</span>
+                {% endif %}
+            </p>
+            <p><strong>Details:</strong> {{ product.product_description }}</p>
+            
+            <!-- Only show Add to Cart form if user is not fieldstaff -->
+            {% if not is_fieldstaff %}
+            <form method="post" action="{% url 'add_to_cart' product.id %}" id="addToCartForm"> 
+                {% csrf_token %}
+                
+                <!-- Only show shades if product is in paints category -->
+                {% if is_paint %}
+                <div class="mb-3">
+                    <h5>Choose a Shade:</h5>
+                    <div class="d-flex flex-wrap">
+                        {% for color, stock in product.available_shades.items %}
+                            <div class="d-flex align-items-center me-3">
+                                <div class="shade-circle color-option" 
+                                     data-color="{{ color }}" 
+                                     data-stock="{{ stock }}"
+                                     style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer; 
+                                            background-color: {{ color }}; 
+                                            opacity: {% if stock > 0 %}1{% else %}0.4{% endif %}; 
+                                            border: 3px solid transparent;"
+                                     onclick="selectColor(this, '{{ color }}', {{ stock }})">
+                                </div>
+                                <span class="ms-2 {% if stock == 0 %}text-danger{% else %}text-success{% endif %}">
+                                    {% if stock > 0 %}
+                                        {{ stock }} in stock
+                                    {% else %}
+                                        Out of stock
+                                    {% endif %}
+                                </span>
+                            </div>
+                        {% empty %}
+                            <p class="text-muted">No shades available</p>
+                        {% endfor %}
+                    </div>
+                    <input type="hidden" id="selectedColor" name="selected_color">
+                </div>
+                {% endif %}
+
+                <div class="form-group mb-3">
+                    <label for="quantity">Quantity:</label>
+                    <div class="input-group">
+                        <button type="button" class="btn btn-outline-secondary" onclick="changeQuantity(-1)">-</button>
+                        <input type="number" name="quantity" id="quantity" class="form-control text-center" value="1" min="1" max="{{ product.total_stock }}">
+                        <button type="button" class="btn btn-outline-secondary" onclick="changeQuantity(1)">+</button>
+                    </div>
+                </div>
+                
+                {% if is_paint %}
+                <!-- For paint products: disabled until color selected -->
+                <button type="button" class="btn btn-primary w-50 mb-2" id="addToCartBtn" disabled onclick="validateAndSubmit()">
+                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                </button>
+                <a href="#" class="btn btn-success w-50" id="buyNowBtn" disabled>Buy Now</a>
+                {% else %}
+                <!-- For non-paint products: enabled by default -->
+                <button type="button" class="btn btn-primary w-50 mb-2" id="addToCartBtn" onclick="validateAndSubmit()">
+                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                </button>
+                <a href="{% url 'checkout' %}?product_id={{ product.id }}&quantity=1" class="btn btn-success w-50" id="buyNowBtn">Buy Now</a>
+                {% endif %}
+            </form>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Related Products Section -->
+    {% if related_products %}
+    <div class="row mt-5">
+        <div class="col-12">
+            <h3>Related Products</h3>
+            <hr>
+        </div>
+        {% for related in related_products %}
+        <div class="col-md-3 mb-4">
+            <div class="card h-100">
+                {% if related.main_image %}
+                <img src="{{ related.main_image.url }}" class="card-img-top" alt="{{ related.product_name }}" style="height: 200px; object-fit: cover;">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ related.product_name }}</h5>
+                    <p class="card-text">₹{{ related.price }}</p>
+                    <a href="{% url 'product_detail' related.id %}" class="btn btn-outline-primary">View Details</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+<!-- Image Modal -->
+<div id="imageModal" class="modal" onclick="closeModal()" style="display:none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8);">
+    <span class="close" style="position: absolute; top: 20px; right: 35px; color: white; font-size: 40px; font-weight: bold; cursor: pointer;" onclick="closeModal()">&times;</span>
+    <img class="modal-content" id="modalImage" style="display: block; margin: auto; max-width: 90%; max-height: 90%;">
+</div>
+
+{% block scripts %}
+<script>
+    function changeImage(src) {
+        document.getElementById('mainImage').src = src;
+    }
+    
+    {% if is_paint %}
+    function selectColor(element, color, stock) {
+        // Remove border from all colors
+        document.querySelectorAll('.color-option').forEach(el => el.style.border = "3px solid transparent");
+
+        // Add border to selected color
+        element.style.border = "3px solid black";
+
+        // Update selected color input
+        document.getElementById('selectedColor').value = color;
+
+        // Update quantity input
+        let quantityInput = document.getElementById('quantity');
+        quantityInput.max = stock;
+        quantityInput.value = stock > 0 ? 1 : 0;
+        quantityInput.disabled = stock <= 0;
+
+        // Enable/Disable buttons
+        document.getElementById('addToCartBtn').disabled = stock <= 0;
+        document.getElementById('buyNowBtn').disabled = stock <= 0;
+        
+        // Update buy now link with current quantity and color
+        if (stock > 0) {
+            let buyNowBtn = document.getElementById('buyNowBtn');
+            buyNowBtn.href = "{% url 'checkout' %}?product_id={{ product.id }}&quantity=" + 
+                           quantityInput.value + "&selected_color=" + encodeURIComponent(color);
+        }
+    }
+    {% endif %}
+
+    function changeQuantity(amount) {
+        let quantityInput = document.getElementById('quantity');
+        let currentValue = parseInt(quantityInput.value);
+        let maxValue = parseInt(quantityInput.max);
+        if (!isNaN(currentValue)) {
+            let newValue = currentValue + amount;
+            if (newValue >= 1 && newValue <= maxValue) {
+                quantityInput.value = newValue;
+                
+                // Update buy now link with new quantity
+                {% if not is_paint %}
+                let buyNowBtn = document.getElementById('buyNowBtn');
+                let productId = {{ product.id }};
+                buyNowBtn.href = "{% url 'checkout' %}?product_id=" + productId + "&quantity=" + newValue;
+                {% elif is_paint %}
+                let buyNowBtn = document.getElementById('buyNowBtn');
+                let color = document.getElementById('selectedColor').value;
+                if (color) {
+                    buyNowBtn.href = "{% url 'checkout' %}?product_id={{ product.id }}&quantity=" + 
+                                   newValue + "&selected_color=" + encodeURIComponent(color);
+                }
+                {% endif %}
+            }
+        }
+    }
+
+    function validateAndSubmit() {
+        {% if is_paint %}
+        // For paint products, validate color selection
+        let selectedColor = document.getElementById('selectedColor').value;
+        if (!selectedColor) {
+            alert('Please select a color shade first.');
+            return false;
+        }
+        {% endif %}
+        
+        // Validate quantity
+        let quantity = parseInt(document.getElementById('quantity').value);
+        let maxQuantity = parseInt(document.getElementById('quantity').max);
+        
+        if (isNaN(quantity) || quantity < 1) {
+            alert('Please enter a valid quantity.');
+            return false;
+        }
+        
+        if (quantity > maxQuantity) {
+            alert('Quantity exceeds available stock.');
+            return false;
+        }
+        
+        // Submit the form
+        document.getElementById('addToCartForm').submit();
+        return true;
+    }
+
+    function openModal(src) {
+        document.getElementById('modalImage').src = src;
+        document.getElementById('imageModal').style.display = "block";
+    }
+
+    function closeModal() {
+        document.getElementById('imageModal').style.display = "none";
+    }
+</script>
+{% endblock %}
+{% endblock %}

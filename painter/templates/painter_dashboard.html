@@ -1,0 +1,53 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painter Dashboard</title>
+    <!-- Linking CSS -->
+    <link rel="stylesheet" href="{% static 'css/dashbase.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <button class="hamburger-menu" id="toggle-btn">☰</button>
+
+            <!-- Profile Section -->
+            <div class="profile-section">
+                <i class="fas fa-user-circle profile-pic" style="font-size: 80px; color: gray;"></i>
+                <div class="profile-info">
+                    <p class="profile-name">{{ user.first_name }} {{ user.last_name }}</p>
+                    <p class="profile-email">{{user.email}}</p>
+                </div>
+            </div>
+
+            <!-- Sidebar Menu -->
+            <ul class="sidebar-menu" id="menu-items">
+                <li><a href="{% url 'painter:painter_profile_update' %}" class="menu-item"><i class="fas fa-user-edit"></i> <span>Update Profile</span></a></li>
+                <li><a href="{% url 'painter:assigned_jobs' %}" class="menu-item"><i class="fas fa-briefcase"></i> <span>Assigned Jobs</span></a></li>
+                <li><a href="{% url 'painter:confirmed_and_completed' %}" class="menu-item"><i class="fas fa-history"></i> <span>view completed jobs</span></a></li>
+                <li><a href="{% url 'chat:dashboard' %}" class="menu-item"><i class="fas fa-comments"></i> <span>chat <sub>  (with customer and admin)</sub></span></a></li>
+                <!--<li><a href="#" class="menu-item"><i class="fas fa-file-alt"></i> <span>nothing</span></a></li>-->
+                <li class="logout-item">
+                    <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: none;">
+                        {% csrf_token %}
+                    </form>
+                    <a href="#" class="menu-item" onclick="document.getElementById('logout-form').submit();">
+                        <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content" id="main-content">
+            {% block content %}
+            {% endblock %}
+        </main>
+    </div>
+    <script src="{% static 'js/script.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,454 @@
+{% extends 'chat/chat_base.html' %}
+{% block title %}Chat{% endblock %}
+{% block content %}
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card chat-room">
+                    <!-- Chat Room Header -->
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4>
+                                {% if chat_room.is_group %}
+                                    {{ chat_room.name }}
+                                    {% if is_group_admin %}
+                                        <a href="{% url 'chat:manage_group' chat_room.id %}" class="btn btn-sm btn-outline-secondary ml-2">
+                                            <i class="fas fa-users-cog"></i> Manage Group
+                                        </a>
+                                    {% endif %}
+                                {% else %}
+                                    Chat with
+                                    {% for participant in other_participants %}
+                                        {{ participant.get_full_name|default:participant.username }}{% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            </h4>
+                        </div>
+                        <a href="{% url 'chat:dashboard' %}" class="btn btn-primary">
+                            <i class="fas fa-arrow-left"></i> Back to Dashboard
+                        </a>
+                    </div>
+                    
+                    <!-- Chat Messages -->
+                    <div class="card-body" id="chat-messages">
+                        <div class="messages-container">
+                            {% for message in messages %}
+                            <div class="message-wrapper mb-3 d-flex {% if message.sender == request.user %}justify-content-end{% else %}justify-content-start{% endif %}">
+                                <div class="message-bubble {% if message.sender == request.user %}sender{% else %}receiver{% endif %}">
+                                    {% if message.is_forwarded %}
+                                        <div class="forwarded-indicator">
+                                            <i class="fas fa-share"></i> Forwarded
+                                        </div>
+                                    {% endif %}
+                                    
+                                    {% if message.content %}
+                                        <div class="message-content">{{ message.content }}</div>
+                                    {% endif %}
+                                    
+                                    {% if message.attachment_type == 'file' %}
+                                        <div class="attachment-file mt-2">
+                                            <a href="{{ message.attachment_file.url }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fas fa-file"></i> {{ message.attachment_file.name|slice:"20:" }}
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    {% if message.attachment_type == 'image' %}
+                                        <div class="attachment-image mt-2">
+                                            <img src="{{ message.attachment_image.url }}" class="img-fluid rounded" style="max-height: 150px;">
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <div class="message-meta">
+                                        <span class="sender-name">{{ message.sender.username }}</span>
+                                        <span class="timestamp">{{ message.timestamp|date:"M d, g:i a" }}</span>
+                                    </div>
+                                    
+                                    <!-- Message Actions -->
+                                    <div class="message-actions">
+                                        <a href="{% url 'chat:forward_message' message.id %}" class="forward-link">
+                                            <i class="fas fa-share"></i> Forward
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="no-messages">
+                                <i class="fas fa-comments"></i>
+                                <p>No messages yet. Start the conversation!</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Message Form -->
+                    <div class="card-footer">
+                        <form method="post" id="message-form" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            
+                            <div class="input-group">
+                                <input type="text" name="content" id="id_content" class="form-control" placeholder="Type a message...">
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary send-btn" type="submit">
+                                        <i class="fas fa-paper-plane"></i> Send
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Attachment Options -->
+                            <div class="attachment-options">
+                                <div class="attachment-button">
+                                    <label for="id_attachment_file">
+                                        <i class="fas fa-paperclip"></i> File
+                                    </label>
+                                    <input type="file" name="attachment_file" id="id_attachment_file" style="display: none;">
+                                </div>
+                                
+                                <div class="attachment-button">
+                                    <label for="id_attachment_image">
+                                        <i class="fas fa-image"></i> Image
+                                    </label>
+                                    <input type="file" name="attachment_image" id="id_attachment_image" accept="image/*" style="display: none;">
+                                </div>
+                            </div>
+                            
+                            <!-- Preview area -->
+                            <div id="attachment-preview" class="mt-2" style="display: none;">
+                                <div class="preview-container">
+                                    <div class="preview-content" id="preview-content"></div>
+                                    <button type="button" id="remove-attachment" class="btn btn-sm btn-link text-danger">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elements
+            const messageContainer = document.getElementById('chat-messages');
+            const messageForm = document.getElementById('message-form');
+            const contentInput = document.getElementById('id_content');
+            const fileInput = document.getElementById('id_attachment_file');
+            const imageInput = document.getElementById('id_attachment_image');
+            const previewContainer = document.getElementById('attachment-preview');
+            const previewContent = document.getElementById('preview-content');
+            const removeButton = document.getElementById('remove-attachment');
+            
+            // Initial scroll to bottom
+            if (messageContainer) {
+                messageContainer.scrollTop = messageContainer.scrollHeight;
+            }
+            
+            // Handle file/image selection
+            function handleFileSelect(e, type) {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                previewContainer.style.display = 'block';
+                
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewContent.innerHTML = `
+                            <div class="preview-file">
+                                <img src="${e.target.result}" class="preview-image">
+                                <div class="file-name">${file.name}</div>
+                            </div>
+                        `;
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    previewContent.innerHTML = `
+                        <div class="preview-file">
+                            <i class="fas fa-file"></i>
+                            <div class="file-name">${file.name}</div>
+                        </div>
+                    `;
+                }
+            }
+            
+            // Set up file/image input listeners
+            if (fileInput) {
+                fileInput.addEventListener('change', (e) => handleFileSelect(e, 'file'));
+            }
+            
+            if (imageInput) {
+                imageInput.addEventListener('change', (e) => handleFileSelect(e, 'image'));
+            }
+            
+            // Reset all attachments
+            function resetAttachments() {
+                if (fileInput) fileInput.value = '';
+                if (imageInput) imageInput.value = '';
+                previewContainer.style.display = 'none';
+                previewContent.innerHTML = '';
+            }
+            
+            // Remove attachment button
+            if (removeButton) {
+                removeButton.addEventListener('click', resetAttachments);
+            }
+            
+            // Form submission handler with improved validation
+            if (messageForm) {
+                messageForm.addEventListener('submit', function(e) {
+                    // Check if we have content or attachments
+                    const hasContent = contentInput.value.trim() !== '';
+                    const hasFile = fileInput && fileInput.files.length > 0;
+                    const hasImage = imageInput && imageInput.files.length > 0;
+                    
+                    if (!hasContent && !hasFile && !hasImage) {
+                        e.preventDefault();
+                        alert('Please enter a message or add an attachment');
+                        return false;
+                    }
+                    
+                    // Show loading state
+                    const submitButtons = this.querySelectorAll('button[type="submit"]');
+                    submitButtons.forEach(btn => {
+                        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+                        btn.disabled = true;
+                    });
+                });
+            }
+            
+            // Periodically scroll to bottom for new messages
+            setInterval(() => {
+                if (messageContainer) {
+                    messageContainer.scrollTop = messageContainer.scrollHeight;
+                }
+            }, 1000);
+        });
+    </script>
+
+    <style>
+        /* Main container */
+        .chat-room {
+            position: relative;
+            background: #f0f2f5;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Header */
+        .card-header {
+            background-color: #fff;
+            padding: 15px;
+            border-bottom: 1px solid #e4e4e4;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-header h4 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        /* Messages area */
+        #chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            background-color: #f0f2f5;
+            height: 400px;
+        }
+        
+        /* Message styling */
+        .message-wrapper {
+            margin-bottom: 15px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .message-bubble {
+            padding: 10px 15px;
+            max-width: 70%;
+            position: relative;
+            word-wrap: break-word;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        
+        .message-bubble.sender {
+            background-color: #dcf8c6;
+            margin-left: auto;
+            border-bottom-right-radius: 0;
+        }
+        
+        .message-bubble.receiver {
+            background-color: #ffffff;
+            margin-right: auto;
+            border-bottom-left-radius: 0;
+        }
+        
+        .message-content {
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .message-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            margin-top: 5px;
+            color: #8696a0;
+        }
+        
+        .forwarded-indicator {
+            color: #8696a0;
+            font-size: 12px;
+            font-style: italic;
+            margin-bottom: 5px;
+        }
+        
+        /* No messages placeholder */
+        .no-messages {
+            text-align: center;
+            padding: 30px;
+            color: #8696a0;
+        }
+        
+        .no-messages i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: #dadada;
+        }
+        
+        /* Message form */
+        .card-footer {
+            background-color: #f0f2f5;
+            padding: 15px;
+            border-top: 1px solid #e4e4e4;
+        }
+        
+        /* Attachment options */
+        .attachment-options {
+            display: flex;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .attachment-button {
+            margin-right: 10px;
+            margin-bottom: 5px;
+        }
+        
+        .attachment-button label,
+        .attachment-button button {
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: #128c7e;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            padding: 0;
+        }
+        
+        .attachment-button i {
+            margin-right: 5px;
+        }
+        
+        /* Attachment preview */
+        .preview-container {
+            position: relative;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 10px;
+            border: 1px solid #e4e4e4;
+        }
+        
+        .preview-file {
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+        }
+        
+        .preview-image {
+            max-height: 150px;
+            max-width: 100%;
+            border-radius: 4px;
+            margin-bottom: 5px;
+        }
+        
+        .preview-image {
+            max-height: 80px;
+            max-width: 80px;
+            border-radius: 4px;
+        }
+        
+        .file-name {
+            font-size: 14px;
+            color: #050505;
+        }
+        
+        #remove-attachment {
+            background: none;
+            border: none;
+            color: #65676b;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #remove-attachment:hover {
+            background-color: #e4e6eb;
+        }
+        
+        /* Message actions */
+        .message-actions {
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            font-size: 12px;
+            margin-top: 3px;
+        }
+        
+        .message-bubble:hover .message-actions {
+            opacity: 1;
+        }
+        
+        .forward-link {
+            color: #65676b;
+            text-decoration: none;
+        }
+        
+        .forward-link:hover {
+            text-decoration: underline;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .message-bubble {
+                max-width: 80%;
+            }
+            
+            .chat-room {
+                height: calc(100vh - 100px);
+            }
+            
+            .attachment-options {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+{% endblock %}

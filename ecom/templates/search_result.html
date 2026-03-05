@@ -1,0 +1,102 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container my-5 pt-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Search Results</li>
+                </ol>
+            </nav>
+            
+            <h2 class="mb-3">Search Results</h2>
+            <p>
+                {% if selected_category %}
+                    Showing results for "{{ query }}" in {{ selected_category.category_name }}
+                {% else %}
+                    Showing results for "{{ query }}" in all categories
+                {% endif %}
+            </p>
+            
+            <!-- Filter sidebar and results -->
+            <div class="row">
+                <!-- Filters sidebar -->
+                <div class="col-md-3">
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Refine Search</h5>
+                        </div>
+                        <div class="card-body">
+                           <!-- Modify your form in search_result.html -->
+                            <form action="{% url 'search_products' %}" method="GET">
+                                <div class="mb-3">
+                                    <label for="search-input" class="form-label">Search Term (Optional)</label>
+                                    <input type="text" class="form-control" id="search-input" name="q" value="{{ query }}" placeholder="Enter keywords...">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="category-filter" class="form-label">Category</label>
+                                    <select class="form-select" id="category-filter" name="category">
+                                        <option value="all" {% if category_id == 'all' %}selected{% endif %}>All Categories</option>
+                                        {% for category in categories %}
+                                            <option value="{{ category.id }}" {% if category_id == category.id|stringformat:"s" %}selected{% endif %}>
+                                                {{ category.category_name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary w-100">Search Products</button>
+                                {% if filters_applied %}
+                                    <a href="{% url 'search_products' %}" class="btn btn-outline-secondary w-100 mt-2">Clear Filters</a>
+                                {% endif %}
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Search results -->
+                <div class="col-md-9">
+                    {% if products %}
+                        <div class="row">
+                            {% for product in products %}
+                            <div class="col-md-4 mb-4">
+                                <a href="{% url 'product_detail' product.id %}" class="text-decoration-none">
+                                    <div class="card shadow-sm border-0 h-100">
+                                        <div id="carousel-{{ product.id }}" class="carousel slide" data-bs-ride="carousel">
+                                            <div class="carousel-inner">
+                                                {% if product.main_image %}
+                                                <div class="carousel-item active">
+                                                    <img src="{{ product.main_image.url }}" class="d-block w-100" alt="{{ product.product_name }}" style="height: 200px; object-fit: cover;">
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="card-body text-center">
+                                            <h5 class="card-title text-dark">{{ product.product_name }}</h5>
+                                            <p class="card-text text-muted">{{ product.product_description|truncatewords:10 }}</p>
+                                            <p class="text-danger fw-bold">₹{{ product.price }}</p>
+                                            <a href="{% url 'product_detail' product.id %}" class="btn btn-outline-primary btn-sm">View Details</a>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <h4 class="mb-3">No products found</h4>
+                            <p>We couldn't find any products matching your search criteria. Try different keywords or browse our categories.</p>
+                            <a href="{% url 'index' %}" class="btn btn-primary">Browse All Products</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% include 'inc/footer.html' %}
+{% endblock content %}

@@ -1,0 +1,96 @@
+{% extends 'painter_dashboard.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    .container {
+        max-width: 900px;
+        margin: auto;
+        padding: 20px;
+    }
+    .section-header {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        text-align: center;
+        position: relative;
+    }
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    .table th, .table td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: center;
+    }
+    .table th {
+        background-color: #007bff;
+        color: white;
+    }
+    .btn-print {
+        background-color: #dc3545;
+        color: white;
+        padding: 5px 10px;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+        border-radius: 3px;
+        position: absolute;
+        top: 0;
+        right: 0;
+    }
+    .btn-print:hover {
+        background-color: #c82333;
+    }
+    .btn-view {
+        background-color: #28a745;
+        color: white;
+        padding: 5px 10px;
+        text-decoration: none;
+        border-radius: 3px;
+        font-size: 14px;
+    }
+    .btn-view:hover {
+        background-color: #218838;
+    }
+</style>
+
+<div class="container">
+    <div class="section-header">
+        Completed Jobs
+        <button onclick="window.print()" class="btn-print">Print</button>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Customer Name</th>
+                <th>Phone Number</th>
+                <th>Square Feet</th>
+                <th>Approximate Finishing Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for job in completed_jobs %}
+            <tr>
+                <td>{{ job.customer.username }}</td>
+                <td>{{ job.customer.customer.phone }}</td>
+                <td>{{ job.square_feet }}</td>
+                <td>{{ job.project_completion_date }}</td>
+                <td>
+                    <a href="{% url 'job_details' job.id %}" class="btn-view">View Details</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">No completed jobs.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

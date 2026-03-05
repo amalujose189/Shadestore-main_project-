@@ -1,0 +1,521 @@
+{% extends 'painter_dashboard.html' %}
+
+{% block content %}
+
+<style>
+    /* General Styling */
+    body {
+        background-color: #f8f9fa;
+    }
+
+    .container-fluid {
+        padding: 1.5rem;
+    }
+
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        border: 1px solid #e3e6f0;
+        background-color: #ffffff;
+    }
+
+    .card-header {
+        border-top-left-radius: 10px !important;
+        border-top-right-radius: 10px !important;
+        font-weight: 500;
+        padding: 12px 20px;
+        background-color: #4e73df;
+        color: white;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    /* Table Styling */
+    .table {
+        margin-bottom: 0;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    .table th {
+        font-weight: 600;
+        background-color: #f8f9fa;
+        color: #495057;
+        text-align: left;
+    }
+
+    .table td, .table th {
+        padding: 12px 15px;
+        vertical-align: middle;
+        border: 1px solid #dee2e6;
+    }
+
+    /* Badge Styling */
+    .badge {
+        padding: 6px 10px;
+        font-weight: 500;
+        font-size: 0.8rem;
+        border-radius: 4px;
+    }
+
+    .badge.bg-success {
+        background-color: #1cc88a !important;
+        color: white;
+    }
+
+    .badge.bg-warning {
+        background-color: #f6c23e !important;
+        color: #212529;
+    }
+
+    .badge.bg-info {
+        background-color: #36b9cc !important;
+        color: white;
+    }
+
+    .badge.bg-secondary {
+        background-color: #858796 !important;
+        color: white;
+    }
+
+    .badge.bg-danger {
+        background-color: #e74a3b !important;
+        color: white;
+    }
+
+    /* Timeline Styling */
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 10px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background-color: #e3e6f0;
+    }
+
+    .timeline-item {
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+    .timeline-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -30px;
+        top: 5px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: #4e73df;
+    }
+
+    .timeline-date {
+        font-size: 0.8rem;
+        color: #858796;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    /* Booking Detail Styling */
+    .booking-details-section {
+        margin-bottom: 20px;
+    }
+
+    .booking-detail-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .booking-detail-item span:first-child {
+        font-weight: 500;
+        min-width: 120px;
+        margin-right: 10px;
+    }
+
+    .booking-detail-item span:last-child {
+        text-align: right;
+    }
+
+    .booking-detail-item:last-child {
+        border-bottom: none;
+    }
+
+    /* Form Styling */
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .form-control, .form-select {
+        display: block;
+        width: 100%;
+        padding: 0.375rem 0.75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        color: #495057;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+
+    .btn-primary {
+        background-color: #4e73df;
+        border-color: #4e73df;
+        color: white;
+        padding: 0.375rem 0.75rem;
+        border-radius: 0.25rem;
+    }
+
+    /* Textarea specific styling */
+    textarea.form-control {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .container-fluid {
+            padding: 10px;
+        }
+
+        .card {
+            margin-bottom: 15px;
+        }
+
+        .table-responsive {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .booking-detail-item {
+            flex-direction: column;
+        }
+
+        .booking-detail-item span:first-child {
+            margin-bottom: 5px;
+        }
+
+        .booking-detail-item span:last-child {
+            text-align: left;
+        }
+    }
+    
+    /* Dotted line for future events */
+    .timeline-item.future-event::before {
+        background-color: transparent;
+        border: 2px dotted #ccc;
+    }
+    
+    .timeline-item.future-event .timeline-content {
+        opacity: 0.7;
+    }
+    
+    /* Update the main timeline vertical line for better contrast */
+    .timeline::before {
+        background-color: #d1d3e2;
+        width: 2px;
+    }
+    
+    /* Success message styling */
+    .completion-success-message {
+        background-color: #e8f5e9;
+        border-left: 4px solid #1cc88a;
+        padding: 10px 15px;
+        margin-bottom: 20px;
+        border-radius: 4px;
+        display: none;
+    }
+    
+    /* Show success message when booking status is completed */
+    {% if booking.status == 'completed' %}
+    .completion-success-message {
+        display: block;
+    }
+    {% endif %}
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Painter Booking  Details</h4>
+                </div>
+                <div class="card-body">
+                    <div class="booking-details-section">
+                        <h5>Customer Information</h5>
+                        <div class="booking-detail-item">
+                            <span>Customer:</span>
+                            <span>
+                                {% if booking.customer.first_name or booking.customer.last_name %}
+                                    {{ booking.customer.first_name }} {{ booking.customer.last_name }}
+                                {% else %}
+                                    {{ booking.customer.username }}
+                                {% endif %}
+                            </span>
+                        </div>
+                        {% if booking.customer.customer_set.first.phone %}
+                        <div class="booking-detail-item">
+                            <span>Phone:</span>
+                            <span>{{ booking.customer.customer_set.first.phone }}</span>
+                        </div>
+                        {% endif %}
+                        {% if booking.customer.customer_set.first.city or booking.customer.customer_set.first.state %}
+                        <div class="booking-detail-item">
+                            <span>Location:</span>
+                            <span>
+                                {% if booking.customer.customer_set.first.city %}{{ booking.customer.customer_set.first.city }}{% endif %}
+                                {% if booking.customer.customer_set.first.city and booking.customer.customer_set.first.state %}, {% endif %}
+                                {% if booking.customer.customer_set.first.state %}{{ booking.customer.customer_set.first.state }}{% endif %}
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="booking-details-section">
+                        <h5>Booking Information</h5>
+                        <div class="booking-detail-item">
+                            <span>Created Date:</span>
+                            <span>{{ booking.created_at|date:"d M Y" }}</span>
+                        </div>
+                        <div class="booking-detail-item">
+                            <span>Painter:</span>
+                            <span>
+                                {% if booking.painter.userid.first_name or booking.painter.userid.last_name %}
+                                    {{ booking.painter.userid.first_name }} {{ booking.painter.userid.last_name }}
+                                {% else %}
+                                    {{ booking.painter.userid.username }}
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="booking-detail-item">
+                            <span>Square Feet:</span>
+                            <span>{{ booking.square_feet }} sq ft</span>
+                        </div>
+                        <div class="booking-detail-item">
+                            <span>Complete within :</span>
+                            <span>{{ booking.project_completion_date|date:"d M Y" }}</span>
+                        </div>
+                        {% if booking.order %}
+                        <div class="booking-detail-item">
+                            <span>Related Order:</span>
+                            <span>
+                                <a href="{% url 'assigned_order_detail' booking.order.id %}">Order #{{ booking.order.id }}</a>
+                            </span>
+                        </div>
+                        {% endif %}
+                        <div class="booking-detail-item">
+                            <span>Status:</span>
+                            <span>
+                                <span class="badge 
+                                    {% if booking.status == 'completed' %}bg-success
+                                    {% elif booking.status == 'confirmed' %}bg-info
+                                    {% else %}bg-warning
+                                    {% endif %}">
+                                    {{ booking.get_status_display }}
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="booking-status-form">
+                        <h5>Update Booking Status</h5>
+                        <form method="post" action="{% url 'painter:painter_booking_detail' booking.id %}">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="status" class="form-label">Booking Status</label>
+                                <select name="status" id="status" class="form-select">
+                                    <option value="pending" {% if booking.status == 'pending' %}selected{% endif %}>Pending</option>
+                                    <option value="confirmed" {% if booking.status == 'confirmed' %}selected{% endif %}>Confirmed</option>
+                                    <!-- Disabled the completed option with explanation -->
+                                    <option value="completed" {% if booking.status == 'completed' %}selected{% endif %} disabled>Completed (Customer Only)</option>
+                                </select>
+                                <small class="form-text text-muted">Note: Only customers can mark bookings as completed.</small>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">Update Status</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            {% if booking.order %}
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">Related Order Items</h4>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Color</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in booking.order.items.all %}
+                                <tr>
+                                    <td>{{ item.product.product_name }}</td>
+                                    <td>{% if item.color %}{{ item.color }}{% else %}N/A{% endif %}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>₹{{ item.product.price }}</td>
+                                    <td>₹{{ item.subtotal }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot class="bg-light">
+                                <tr>
+                                    <td colspan="4" class="text-end fw-bold">Total:</td>
+                                    <td class="fw-bold">₹{{ booking.order.total_amount }}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="card mt-3">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">Booking Timeline</h4>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <span class="timeline-date">{{ booking.created_at|date:"d M Y" }}</span>
+                            <div class="timeline-content">
+                                <span class="badge bg-secondary">Booking Created</span>
+                                <p>Painter Booking  was created by customer</p>
+                            </div>
+                        </div>
+                        
+                        {% if booking.status != 'pending' %}
+                        <div class="timeline-item">
+                            <span class="timeline-date">{{ booking.created_at|date:"d M Y" }}</span>
+                            <div class="timeline-content">
+                                <span class="badge bg-info">Confirmed</span>
+                                <p>Painter has been assigned and booking confirmed</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Project completion date (Shows as colorless with dotted line when not yet completed) -->
+                        <div class="timeline-item {% if booking.status != 'completed' %}future-event{% endif %}">
+                            <span class="timeline-date">{{ booking.project_completion_date|date:"d M Y" }}</span>
+                            <div class="timeline-content">
+                                <span class="badge {% if booking.status == 'completed' %}bg-success{% else %}bg-light text-secondary{% endif %}">
+                                    {% if booking.status == 'completed' %}Completed{% else %}Scheduled Completion{% endif %}
+                                </span>
+                                <p>
+                                    {% if booking.status == 'completed' %}
+                                        Project has been successfully completed
+                                    {% else %}
+                                        Scheduled project completion date
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Success message that shows only when booking is completed -->
+                <div class="completion-success-message">
+                    <i class="fas fa-check-circle text-success"></i>
+                    <span class="ml-2">Painting project completed successfully!</span>
+                </div>
+            </div>
+            
+            {% if booking.notes %}
+            <div class="card mt-3">
+                <div class="card-header bg-secondary text-white">
+                    <h4 class="mb-0">Notes</h4>
+                </div>
+                <div class="card-body">
+                    {{ booking.notes|linebreaks }}
+                </div>
+            </div>
+            {% endif %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Communication</h5>
+                </div>
+                <div class="card-body">
+                    <a href="{% url 'chat:dashboard' %}" class="btn btn-primary btn-block">
+                        <i class="fas fa-comments"></i> Chat with Customers & Admin
+                        <span class="badge badge-light chat-unread-count"></span>
+                    </a>
+                </div>
+            </div>
+            <!-- Painter Details Card -->
+            <div class="card mt-3">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Painter Details</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="booking-detail-item">
+                                <span>Name:</span>
+                                <span>
+                                    {% if booking.painter.userid.first_name or booking.painter.userid.last_name %}
+                                        {{ booking.painter.userid.first_name }} {{ booking.painter.userid.last_name }}
+                                    {% else %}
+                                        {{ booking.painter.userid.username }}
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="booking-detail-item">
+                                <span>Experience:</span>
+                                <span>{{ booking.painter.experience_years }} years</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="booking-detail-item">
+                                <span>Status:</span>
+                                <span>
+                                    <span class="badge 
+                                        {% if booking.painter.current_status == 'available' %}bg-success
+                                        {% elif booking.painter.current_status == 'onproject' %}bg-warning
+                                        {% else %}bg-danger
+                                        {% endif %}">
+                                        {{ booking.painter.get_current_status_display }}
+                                    </span>
+                                </span>
+                            </div>
+                            <div class="booking-detail-item">
+                                <span>Join Date:</span>
+                                <span>{{ booking.painter.join_date|date:"d M Y" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

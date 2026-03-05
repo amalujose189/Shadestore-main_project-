@@ -1,0 +1,15 @@
+{# Save this as templates/components/rating_stars.html #}
+{% comment %}
+Usage:
+{% include 'components/rating_stars.html' with rating=product.average_rating %}
+{% endcomment %}
+
+{% for i in "12345" %}
+    {% if forloop.counter <= rating|floatformat:0|add:"0" %}
+        <i class="fas fa-star text-warning" aria-hidden="true"></i>
+    {% elif forloop.counter <= rating|add:"0.5"|floatformat:0|add:"0" %}
+        <i class="fas fa-star-half-alt text-warning" aria-hidden="true"></i>
+    {% else %}
+        <i class="far fa-star text-warning" aria-hidden="true"></i>
+    {% endif %}
+{% endfor %}

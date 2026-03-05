@@ -1,0 +1,183 @@
+{% extends 'showroomstaff_dash.html' %}
+
+{% block content %}
+<div class="product-detail-container">
+    <h1 class="product-name">{{ product.product_name }}</h1>
+    
+    <div class="product-images">
+        {% if product.main_image %}
+        <div class="main-image">
+            <img id="mainImage" src="{{ product.main_image.url }}" alt="{{ product.product_name }}" class="img-fluid" onclick="changeImage(this.src, event)">
+        </div>
+        {% endif %}
+        
+        <div class="additional-images">
+            {% if product.additional_image_1 %}
+            <div class="additional-image">
+                <img src="{{ product.additional_image_1.url }}" alt="{{ product.product_name }} - Image 1" class="thumbnail active" onclick="changeImage(this.src, event)">
+            </div>
+            {% endif %}
+            
+            {% if product.additional_image_2 %}
+            <div class="additional-image">
+                <img src="{{ product.additional_image_2.url }}" alt="{{ product.product_name }} - Image 2" class="thumbnail" onclick="changeImage(this.src, event)">
+            </div>
+            {% endif %}
+            
+            {% if product.additional_image_3 %}
+            <div class="additional-image">
+                <img src="{{ product.additional_image_3.url }}" alt="{{ product.product_name }} - Image 3" class="thumbnail" onclick="changeImage(this.src, event)">
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="product-info">
+        <div class="info-section">
+            <h3>Description:</h3>
+            <p>{{ product.product_description }}</p>
+        </div>
+        
+        <div class="info-section">
+            <h3>Category:</h3>
+            <p>{{ product.category.category_name }}</p>
+        </div>
+        
+        <div class="info-section">
+            <h3>Price:</h3>
+            <p>₹{{ product.price }}</p>
+        </div>
+        
+        <div class="info-section">
+            {% if product.category.category_name == "paints" %}
+                <h3>Available Shades:</h3>
+                {% if product.available_shades %}
+                    <div class="shades-container">
+                        {% for color, stock in product.available_shades.items %}
+                            <div class="shade-item">
+                                <div class="color-swatch" style="background-color: {{ color }};"></div>
+                                <div class="shade-info">
+                                    <span class="shade-color">{{ color }}</span>
+                                    <span class="shade-stock">{{ stock }} in stock</span>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <p>No shades available at the moment.</p>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p>No shades available at the moment.</p>
+                {% endif %}
+            {% else %}
+                <h3>Stock:</h3>
+                <p>{{ product.total_stock }} units available</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<script>
+    function changeImage(src, event) {
+    document.getElementById('mainImage').src = src;
+    document.querySelectorAll('.thumbnail').forEach(img => img.classList.remove('active'));
+    event.target.classList.add('active');
+}
+</script>
+
+<style>
+    .product-detail-container {
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin: 20px auto;
+        max-width: 1000px;
+    }
+    
+    .product-name {
+        color: #333;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .product-images {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 20px;
+    }
+    
+    .main-image {
+        margin-bottom: 15px;
+    }
+    
+    .main-image img {
+        max-width: 50%;
+        height: auto;
+        border-radius: 8px;
+    }
+    
+    .additional-images {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+    }
+    
+    .additional-image img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    
+    .product-info {
+        padding: 15px;
+    }
+    
+    .info-section {
+        margin-bottom: 20px;
+    }
+    
+    .info-section h3 {
+        color: #555;
+        margin-bottom: 5px;
+    }
+    
+    .shades-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    
+    .shade-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px;
+        border-radius: 4px;
+        background-color: #f8f9fa;
+        min-width: 180px;
+    }
+    
+    .color-swatch {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: 1px solid #ddd;
+    }
+    
+    .shade-info {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .shade-color {
+        font-weight: bold;
+    }
+    
+    .shade-stock {
+        font-size: 0.9em;
+        color: #666;
+    }
+</style>
+{% endblock %}

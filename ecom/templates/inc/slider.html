@@ -1,0 +1,269 @@
+{% load static %}
+
+<!-- Improved Slider HTML -->
+<div id="homeCarousel" class="carousel slide" data-bs-ride="carousel">
+  <div class="carousel-indicators">
+    <button type="button" data-bs-target="#homeCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+    <button type="button" data-bs-target="#homeCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+    <button type="button" data-bs-target="#homeCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+    <button type="button" data-bs-target="#homeCarousel" data-bs-slide-to="3" aria-label="Slide 4"></button>
+  </div>
+
+  <div class="carousel-inner">
+    <div class="carousel-item active" data-bs-interval="5000">
+      <img src="{% static 'images/asian.webp' %}" class="d-block w-100" alt="Asian Paints">
+      <div class="carousel-caption">
+        <h2>Premium Paint Solutions</h2>
+        <p>Discover our wide range of high-quality paints</p>
+        <a href="{% url 'category_detail' 1 %}" class="btn btn-primary">Shop Now</a>
+      </div>
+    </div>
+    <div class="carousel-item" data-bs-interval="5000">
+      <img src="{% static 'images/slider2.1.png' %}" class="d-block w-100" alt="Interior Paints">
+      <div class="carousel-caption">
+        <h2>Transform Your Interior</h2>
+        <p>Beautiful colors for every room in your home</p>
+        <a href="{% url 'category_detail' 2 %}" class="btn btn-primary">Explore Interior</a>
+      </div>
+    </div>
+    <div class="carousel-item" data-bs-interval="5000">
+      <img src="{% static 'images/slider3.1.png' %}" class="d-block w-100" alt="Exterior Paints">
+      <div class="carousel-caption">
+        <h2>Weather-Resistant Exterior</h2>
+        <p>Protect and beautify your home's exterior</p>
+        <a href="{% url 'category_detail' 3 %}" class="btn btn-primary">Explore Exterior</a>
+      </div>
+    </div>
+    <div class="carousel-item" data-bs-interval="5000">
+      <img src="{% static 'images/slider4.1.png' %}" class="d-block w-100" alt="Special Effects">
+      <div class="carousel-caption">
+        <h2>Special Effect Finishes</h2>
+        <p>Create unique textures and visual effects</p>
+        <a href="{% url 'category_detail' 4 %}" class="btn btn-primary">Discover Effects</a>
+      </div>
+    </div>
+  </div>
+
+  <button class="carousel-control-prev" type="button" data-bs-target="#homeCarousel" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#homeCarousel" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>
+
+<style>
+/* Enhanced Carousel Styling for ShadeStore */
+#homeCarousel {
+  margin-bottom: 30px;
+  position: relative;
+  width: 100%;
+  overflow: visible; /* Changed from hidden to visible */
+  border-radius: 0 0 15px 15px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  z-index: 10; /* Added z-index to ensure it's above other elements */
+}
+
+/* Image styling */
+#homeCarousel .carousel-item {
+  height: 500px;
+  background-color: transparent; /* Changed from #000 to transparent */
+}
+
+#homeCarousel .carousel-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 1; /* Changed from 0.85 to 1 for better visibility */
+}
+
+/* Caption styling */
+#homeCarousel .carousel-caption {
+  bottom: 25%;
+  text-align: center;
+  max-width: 80%;
+  margin: 0 auto;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 20px;
+  border-radius: 10px;
+  animation: fadeInUp 1s;
+  z-index: 20; /* Ensure caption is above the image */
+}
+
+#homeCarousel .carousel-caption h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+  color: #fff;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+#homeCarousel .carousel-caption p {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  color: #f8f9fa;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+#homeCarousel .carousel-caption .btn {
+  font-size: 1.1rem;
+  padding: 10px 30px;
+  border-radius: 30px;
+  background: linear-gradient(90deg, #3498db, #2c3e50);
+  border: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+#homeCarousel .carousel-caption .btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 7px 15px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(90deg, #2c3e50, #3498db);
+}
+
+/* Control buttons styling */
+#homeCarousel .carousel-control-prev,
+#homeCarousel .carousel-control-next {
+  width: 5%;
+  opacity: 0.8;
+  z-index: 30; /* Increased z-index to ensure controls are clickable */
+}
+
+#homeCarousel .carousel-control-prev-icon,
+#homeCarousel .carousel-control-next-icon {
+  width: 40px;
+  height: 40px;
+  background-color: rgba(52, 152, 219, 0.7);
+  border-radius: 50%;
+  background-size: 50%;
+}
+
+#homeCarousel .carousel-control-prev:hover,
+#homeCarousel .carousel-control-next:hover {
+  opacity: 1;
+}
+
+/* Indicators styling */
+#homeCarousel .carousel-indicators {
+  bottom: 20px;
+  z-index: 25; /* Ensure indicators are above the content */
+}
+
+#homeCarousel .carousel-indicators button {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin: 0 5px;
+  background-color: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+#homeCarousel .carousel-indicators button.active {
+  background-color: #3498db;
+  transform: scale(1.2);
+  box-shadow: 0 0 10px rgba(52, 152, 219, 0.7);
+}
+
+/* Animation for caption */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 30px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Responsive styles */
+@media (max-width: 992px) {
+  #homeCarousel .carousel-item {
+    height: 400px;
+  }
+  
+  #homeCarousel .carousel-caption h2 {
+    font-size: 2rem;
+  }
+  
+  #homeCarousel .carousel-caption p {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  #homeCarousel .carousel-item {
+    height: 350px;
+  }
+  
+  #homeCarousel .carousel-caption {
+    bottom: 20%;
+    padding: 15px;
+  }
+  
+  #homeCarousel .carousel-caption h2 {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+  }
+  
+  #homeCarousel .carousel-caption p {
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+  }
+  
+  #homeCarousel .carousel-caption .btn {
+    font-size: 0.9rem;
+    padding: 8px 20px;
+  }
+  
+  #homeCarousel .carousel-indicators {
+    bottom: 10px;
+  }
+  
+  #homeCarousel .carousel-indicators button {
+    width: 10px;
+    height: 10px;
+    margin: 0 3px;
+  }
+}
+
+@media (max-width: 576px) {
+  #homeCarousel .carousel-item {
+    height: 250px;
+  }
+  
+  #homeCarousel .carousel-caption {
+    bottom: 15%;
+    padding: 10px;
+  }
+  
+  #homeCarousel .carousel-caption h2 {
+    font-size: 1.5rem;
+    margin-bottom: 5px;
+  }
+  
+  #homeCarousel .carousel-caption p {
+    font-size: 0.8rem;
+    margin-bottom: 10px;
+  }
+  
+  #homeCarousel .carousel-caption .btn {
+    font-size: 0.8rem;
+    padding: 5px 15px;
+  }
+  
+  #homeCarousel .carousel-control-prev,
+  #homeCarousel .carousel-control-next {
+    width: 10%;
+  }
+  
+  #homeCarousel .carousel-control-prev-icon,
+  #homeCarousel .carousel-control-next-icon {
+    width: 30px;
+    height: 30px;
+  }
+}
+</style>

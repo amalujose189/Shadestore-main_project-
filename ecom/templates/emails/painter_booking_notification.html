@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>New Painting Job</title>
+</head>
+<body>
+    <h2>New Painting Job Assigned</h2>
+    <p>Hello {{ painter.userid.get_full_name }},</p>
+    
+    <p>You have been assigned a new painting job with the following details:</p>
+    
+    <ul>
+        <li><strong>Customer:</strong> {{ customer.userid.get_full_name }}</li>
+        <li><strong>Phone:</strong> {{ customer_phone }}</li>
+        <li><strong>Project Date:</strong> {{ project_date }}</li>
+        <li><strong>Location:</strong> {{ location }}</li>
+        <li><strong>Area:</strong> {{ square_feet }} sq.ft</li>
+        <li><strong>Order #:</strong> {{ order.id }}</li>
+    </ul>
+    
+    <p>Please contact the customer to confirm the details and schedule.</p>
+    
+    <p>Thank you,<br>
+    Your Paint Shop Team</p>
+</body>
+</html>

@@ -1,0 +1,201 @@
+{% extends 'painter_dashboard.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/sitevisit.css' %}">
+<style>
+    .site-visit-container {
+        padding: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .site-visit-card {
+        background-color: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .form-section {
+        background-color: #f8fafc;
+        border-radius: 0.375rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid #3b82f6;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+        margin-top: 1rem;
+    }
+
+    .table-auto {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 5px;
+    }
+
+    .table-auto thead tr {
+        background-color: #f1f5f9;
+    }
+
+    .table-auto th {
+        font-weight: 600;
+        text-align: left;
+        padding: 10px;
+    }
+
+    .table-auto td {
+        padding: 10px;
+        border: 1px solid #d1d5db;
+    }
+
+    .table-auto tbody tr:hover {
+        background-color: #f8fafc;
+    }
+
+    .btn-primary {
+        display: inline-block;
+        background-color: #3b82f6;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 0.25rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: background-color 0.2s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #2563eb;
+    }
+
+    .alert {
+        border-left: 4px solid #3b82f6;
+    }
+
+    h1, h5 {
+        color: #1e3a8a;
+    }
+
+    .section-title {
+        margin-top: 2rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #3b82f6;
+    }
+
+    @media (max-width: 768px) {
+        .site-visit-container {
+            padding: 1rem;
+        }
+        .site-visit-card {
+            padding: 1.5rem;
+        }
+        .form-section {
+            padding: 1rem;
+        }
+    }
+</style>
+<div class="site-visit-container">
+    <!-- Completed Works Section -->
+    <div class="site-visit-card">
+        <h1 class="text-2xl font-bold mb-6">Completed Works</h1>
+        <div class="form-section">
+            <h5 class="text-lg font-semibold mb-3">Completion Statistics</h5>
+            <p><strong>Painter:</strong> {{ painter }}</p>
+            <p><strong>Total Completed Works:</strong> {{ total_completed_works }}</p>
+            <p><strong>Total Square Footage:</strong> {{ total_square_footage }} sq ft</p>
+        </div>
+
+        {% if completed_works %}
+        <div class="table-responsive">
+            <table class="table-auto border border-gray-300 shadow-lg rounded-lg overflow-hidden">
+                <thead>
+                    <tr class="bg-blue-500 text-white">
+                        <th>Job ID</th>
+                        <th>Customer</th>
+                        <th>Phone</th>
+                        <th>Square Feet</th>
+                        <th>Completion Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for job in completed_works %}
+                    <tr class="bg-white hover:bg-gray-100 transition-all duration-200">
+                        <td>{{ job.id }}</td>
+                        <td>{{ job.customer.first_name }} {{ job.customer.last_name }}</td>
+                        <td>{{ job.customer_phone }}</td>
+                        <td>{{ job.square_feet }}</td>
+                        <td>{{ job.project_completion_date }}</td>
+                        <td>{{ job.status }}</td>
+                        <td>
+                            <a href="{% url 'painter:painter_booking_detail' job.id %}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm transition-all duration-200">
+                                View Details
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert bg-blue-100 text-blue-700 p-4 rounded-lg mt-4">
+            You have not completed any works yet.
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Confirmed Works Section -->
+    <div class="site-visit-card">
+        <h1 class="text-2xl font-bold mb-6">Confirmed Works</h1>
+        <div class="form-section">
+            <h5 class="text-lg font-semibold mb-3">Confirmation Statistics</h5>
+            <p><strong>Painter:</strong> {{ painter }}</p>
+            <p><strong>Total Confirmed Works:</strong> {{ total_confirmed_works }}</p>
+            <p><strong>Pending Square Footage:</strong> {{ pending_square_footage }} sq ft</p>
+        </div>
+
+        {% if confirmed_works %}
+        <div class="table-responsive">
+            <table class="table-auto border border-gray-300 shadow-lg rounded-lg overflow-hidden">
+                <thead>
+                    <tr class="bg-blue-500 text-white">
+                        <th>Job ID</th>
+                        <th>Customer</th>
+                        <th>Phone</th>
+                        <th>Square Feet</th>
+            
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for job in confirmed_works %}
+                    <tr class="bg-white hover:bg-gray-100 transition-all duration-200">
+                        <td>{{ job.id }}</td>
+                        <td>{{ job.customer.first_name }} {{ job.customer.last_name }}</td>
+                        <td>{{ job.customer_phone }}</td>
+                        <td>{{ job.square_feet }}</td>
+                     
+                        <td>{{ job.status }}</td>
+                        <td>
+                            <a href="{% url 'painter:painter_booking_detail' job.id %}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm transition-all duration-200">
+                                View Details
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert bg-blue-100 text-blue-700 p-4 rounded-lg mt-4">
+            You do not have any confirmed works yet.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

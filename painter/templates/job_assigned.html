@@ -1,0 +1,131 @@
+{% extends 'painter_dashboard.html' %}  
+{% block content %}       
+
+<style>     
+    body {
+        background-color: #f8f9fa;
+        font-family: Arial, sans-serif;
+    }
+
+    .container-fluid {
+        padding: 1rem;
+    }
+
+    .card {
+        border-radius: 12px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        border: none;
+        background-color: #ffffff;
+        padding: 15px;
+    }
+
+    .card-header {
+        border-top-left-radius: 12px !important;
+        border-top-right-radius: 12px !important;
+        font-weight: 600;
+        padding: 12px 18px;
+        background-color: #4e73df;
+        color: white;
+    }
+
+    .card-body {
+        padding: 18px;
+    }
+
+    .table {
+        border-collapse: collapse;
+        width: 100%;
+        border-spacing: 0 10px;
+        background-color: #ffffff; /* Ensure table inside card remains white */
+    }
+
+    .table th {
+        font-weight: 700;
+        background-color: #f1f3f5;
+        text-align: left;
+        padding: 14px 16px;
+    }
+
+    .table td, .table th {
+        padding: 14px 16px;
+        border: 1px solid #dee2e6;
+    }
+
+    .table tbody tr {
+        background-color: #ffffff;
+        transition: background-color 0.3s;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .form-control, .form-select {
+        width: 100%;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+    }
+
+    .btn {
+        border-radius: 6px;
+        padding: 8px 12px;
+    }
+
+    .status-pending {
+        color: #f6c23e;
+        font-weight: bold;
+    }
+
+    .status-confirmed {
+        color: #4e73df;
+        font-weight: bold;
+    }
+
+    .status-completed {
+        color: #1cc88a;
+        font-weight: bold;
+    }
+</style>  
+
+<h2 class="mb-4">Assigned Jobs</h2>
+
+<div class="card">
+    <div class="card-header">Assigned Jobs List</div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Customer Name</th>
+                        <th>Phone Number</th>
+                        <th>Square Feet</th>
+                        <th>Project Completion Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for job in jobs %}
+                        <tr>
+                            <td>{{ job.customer_name }}</td>
+                            <td>{{ job.phone }}</td>
+                            <td>{{ job.square_feet }}</td>
+                            <td>{{ job.project_completion_date }}</td>
+                            <td>{{ job.status }}</td>
+                            <td>
+                                <a href="{% url 'painter:painter_booking_detail' job.id %}" class="btn btn-primary btn-sm">View Details</a><!---->
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center">No assigned jobs.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

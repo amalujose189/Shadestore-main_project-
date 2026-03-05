@@ -1,0 +1,32 @@
+<!-- Create a partial template: chat/templates/chat/notifications.html -->
+{% if user.is_authenticated %}
+<div class="chat-notification">
+    <span class="badge badge-pill badge-danger chat-unread-count">0</span>
+    <a href="{% url 'chat:dashboard' %}" class="chat-icon">
+        <i class="fas fa-comments"></i>
+    </a>
+</div>
+
+<script>
+    // Function to update unread message counts
+    function updateUnreadCounts() {
+        fetch('{% url "chat:get_unread_count" %}')
+            .then(response => response.json())
+            .then(data => {
+                const unreadCountElement = document.querySelector('.chat-unread-count');
+                if (data.unread_count > 0) {
+                    unreadCountElement.textContent = data.unread_count;
+                    unreadCountElement.style.display = 'inline';
+                } else {
+                    unreadCountElement.style.display = 'none';
+                }
+            });
+    }
+
+    // Update counts on page load and every 30 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+        updateUnreadCounts();
+        setInterval(updateUnreadCounts, 30000);
+    });
+</script>
+{% endif %}

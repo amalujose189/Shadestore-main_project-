@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>New Order Notification</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; }
+        .order-details { margin: 20px 0; border: 1px solid #ddd; padding: 15px; }
+        .item { margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+        .total { font-weight: bold; font-size: 1.2em; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h2>New Order Received</h2>
+    
+    <div class="order-details">
+        <h3>Order #{{ order.id }}</h3>
+        <p><strong>Customer:</strong> {{ customer.username }}</p>
+        <p><strong>Order Date:</strong> {{ order.order_date }}</p>
+        <p><strong>Shipping Address:</strong> {{ order.shipping_address }}, {{ order.city }}, {{ order.state }}</p>
+        <p><strong>Phone:</strong> {{ order.phone }}</p>
+        
+        <h4>Order Items:</h4>
+        {% for item in items %}
+        <div class="item">
+            <p>{{ item.product.product_name }} ({{ item.quantity }} x ₹{{ item.price }})</p>
+            {% if item.color %}<p>Color: {{ item.color }}</p>{% endif %}
+            <p>Subtotal: ₹{{ item.get_total }}</p>
+        </div>
+        {% endfor %}
+        
+        <div class="total">
+            Total Amount: ₹{{ order.total_amount }}
+        </div>
+    </div>
+    
+    <p>Please process this order as soon as possible.</p>
+    <p>Thank you!</p>
+</body>
+</html>

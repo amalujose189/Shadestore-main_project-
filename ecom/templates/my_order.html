@@ -1,0 +1,610 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+<style>
+    /* General Styling */
+    body {
+        background-color: #f8f9fa;
+    }
+
+    .container-fluid {
+        padding: 1.5rem;
+    }
+
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        border: 1px solid #e3e6f0;
+        background-color: #ffffff;
+    }
+
+    .card-header {
+        border-top-left-radius: 10px !important;
+        border-top-right-radius: 10px !important;
+        font-weight: 500;
+        padding: 12px 20px;
+        background-color: #4e73df;
+        color: white;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    /* Table Styling */
+    .table {
+        margin-bottom: 0;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    .table th {
+        font-weight: 600;
+        background-color: #f8f9fa;
+        color: #495057;
+        text-align: left;
+    }
+
+    .table td, .table th {
+        padding: 12px 15px;
+        vertical-align: middle;
+        border: 1px solid #dee2e6;
+    }
+
+    /* Badge Styling */
+    .badge {
+        padding: 6px 10px;
+        font-weight: 500;
+        font-size: 0.8rem;
+        border-radius: 4px;
+    }
+
+    .badge.bg-success {
+        background-color: #1cc88a !important;
+        color: white;
+    }
+
+    .badge.bg-warning {
+        background-color: #f6c23e !important;
+        color: #212529;
+    }
+
+    .badge.bg-info {
+        background-color: #36b9cc !important;
+        color: white;
+    }
+
+    .badge.bg-secondary {
+        background-color: #858796 !important;
+        color: white;
+    }
+
+    .badge.bg-danger {
+        background-color: #e74a3b !important;
+        color: white;
+    }
+
+    /* Filter Controls */
+    .filter-controls {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid #e3e6f0;
+    }
+
+    /* Painter Status Indicator */
+    .painter-status-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 5px;
+    }
+
+    .painter-status-available {
+        background-color: #1cc88a;
+    }
+
+    .painter-status-onproject {
+        background-color: #f6c23e;
+    }
+
+    .painter-status-unavailable {
+        background-color: #e74a3b;
+    }
+
+    /* Tab Navigation */
+    .nav-tabs {
+        border-bottom: 1px solid #e3e6f0;
+        margin-bottom: 20px;
+    }
+
+    .nav-tabs .nav-link {
+        border: none;
+        color: #5a5c69;
+        font-weight: 500;
+        padding: 12px 20px;
+    }
+
+    .nav-tabs .nav-link.active {
+        color: #4e73df;
+        background-color: transparent;
+        border-bottom: 3px solid #4e73df;
+    }
+
+    .nav-tabs .nav-link:hover {
+        border-color: transparent;
+        color: #4e73df;
+    }
+
+    /* Progress Bar */
+    .progress {
+        height: 8px;
+        margin-top: 10px;
+        margin-bottom: 5px;
+        background-color: #eaecf4;
+    }
+
+    .progress-bar {
+        border-radius: 4px;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        color: #d1d3e2;
+        margin-bottom: 20px;
+    }
+
+    .empty-state h4 {
+        color: #5a5c69;
+        margin-bottom: 10px;
+    }
+
+    .empty-state p {
+        color: #858796;
+        margin-bottom: 20px;
+    }
+
+    /* Action Button */
+    .action-btn {
+        color: #4e73df;
+        text-decoration: none;
+        background-color: transparent;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+    }
+
+    .action-btn:hover {
+        color: #2e59d9;
+        text-decoration: underline;
+    }
+
+    /* Responsive styles */
+    @media (max-width: 768px) {
+        .container-fluid {
+            padding: 10px;
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        .filter-controls .row {
+            flex-direction: column;
+        }
+        
+        .filter-controls .col-md-3 {
+            margin-bottom: 10px;
+        }
+    }
+</style>
+
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800 my-5"><b><i>My Orders & Painter Bookings</i></b></h1>
+    </div>
+
+    <!-- Tab Navigation -->
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="orders-tab" data-bs-toggle="tab" data-bs-target="#orders" type="button" role="tab" aria-controls="orders" aria-selected="true">
+                <i class="fas fa-shopping-cart me-2"></i>Orders
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="painters-tab" data-bs-toggle="tab" data-bs-target="#painters" type="button" role="tab" aria-controls="painters" aria-selected="false">
+                <i class="fas fa-paint-roller me-2"></i>Painter Bookings
+            </button>
+        </li>
+    </ul>
+    
+    <div class="tab-content" id="myTabContent">
+        <!-- ORDERS TAB -->
+        <div class="tab-pane fade show active" id="orders" role="tabpanel" aria-labelledby="orders-tab">
+            <!-- Orders Filter Controls -->
+           <!-- <div class="filter-controls">
+                <div class="row">
+                    <div class="col-md-8">
+                        <form class="d-flex">
+                            <input type="text" class="form-control" placeholder="Search orders..." name="order_q" value="{{ request.GET.order_q }}">
+                            <button type="submit" class="btn btn-primary ms-2">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </form>
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-select" name="order_status" id="orderStatusFilter">
+                            <option value="">All Order Statuses</option>
+                            <option value="pending">Pending</option>
+                            <option value="shipped">Shipped</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+            </div>-->
+            
+            <!-- Orders Table -->
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">All Orders</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Date</th>
+                                    <th>Products</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                   <!-- <th>Has Painter</th>-->
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if orders %}
+                                    {% for order in orders %}
+                                    <tr>
+                                        <td>#{{ order.id }}</td>
+                                        <td>{{ order.date|date:"d M Y" }}</td>
+                                        <td>{{ order.items.count }} item(s)</td>
+                                        <td>₹{{ order.total_amount }}</td>
+                                        <td>
+                                            <span class="badge 
+                                                {% if order.status == 'delivered' %}bg-success
+                                                {% elif order.status == 'shipped' %}bg-info
+                                                {% elif order.status == 'cancelled' %}bg-danger
+                                                {% else %}bg-warning
+                                                {% endif %}">
+                                                {{ order.get_status_display }}
+                                            </span>
+                                        </td>
+                                       <!-- <td>
+                                            % if order.painter_bookings.exists %
+                                                <span class="badge bg-success">Yes</span>
+                                            % else %
+                                                <span class="badge bg-secondary">No</span>
+                                            % endif %
+                                        </td>-->
+                                        <td>
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton{{ order.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    Actions
+                                                </button>
+                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ order.id }}">
+                                                    <li><a class="dropdown-item" href="{% url 'order_detail' order.id %}">View Details</a></li>
+                                                    {% if order.status != 'cancelled' and order.status != 'delivered' %}
+                                                    <li><a class="dropdown-item text-danger" href="">Cancel Order</a></li><!--% url 'cancel_order' order.id %-->
+                                                    {% endif %}
+                                                    {% if not order.painter_bookings.exists %}
+                                                    <li><a class="dropdown-item" href="">Book Painter</a></li><!--% url 'book_painter' %}?order_id={{ order.id }}-->
+                                                    {% endif %}
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="7">
+                                            <div class="empty-state">
+                                                <i class="fas fa-shopping-cart"></i>
+                                                <h4>No Orders Found</h4>
+                                                <p>You haven't placed any orders yet.</p>
+                                                <a href="" class="btn btn-primary">Shop Now</a><!--% url 'products' %-->
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Orders Pagination -->
+            {% if orders.has_other_pages %}
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if orders.has_previous %}
+                        <li class="page-item"><a class="page-link" href="?page=1&tab=orders">&laquo; First</a></li>
+                        <li class="page-item"><a class="page-link" href="?page={{ orders.previous_page_number }}&tab=orders">Previous</a></li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">&laquo; First</span></li>
+                        <li class="page-item disabled"><span class="page-link">Previous</span></li>
+                    {% endif %}
+                    
+                    {% for i in orders.paginator.page_range %}
+                        {% if orders.number == i %}
+                            <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                        {% elif i > orders.number|add:'-3' and i < orders.number|add:'3' %}
+                            <li class="page-item"><a class="page-link" href="?page={{ i }}&tab=orders">{{ i }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if orders.has_next %}
+                        <li class="page-item"><a class="page-link" href="?page={{ orders.next_page_number }}&tab=orders">Next</a></li>
+                        <li class="page-item"><a class="page-link" href="?page={{ orders.paginator.num_pages }}&tab=orders">Last &raquo;</a></li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">Next</span></li>
+                        <li class="page-item disabled"><span class="page-link">Last &raquo;</span></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+        
+        <!-- PAINTER BOOKINGS TAB -->
+        <div class="tab-pane fade" id="painters" role="tabpanel" aria-labelledby="painters-tab">
+            <!-- Painter Bookings Filter Controls -->
+           <!--  <div class="filter-controls">
+                <div class="row">
+                    <div class="col-md-8">
+                        <form class="d-flex">
+                            <input type="text" class="form-control" placeholder="Search painter bookings..." name="booking_q" value="{{ request.GET.booking_q }}">
+                            <button type="submit" class="btn btn-primary ms-2">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </form>
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-select" name="booking_status" id="bookingStatusFilter">
+                            <option value="">All Booking Statuses</option>
+                            <option value="pending">Pending</option>
+                            <option value="confirmed">Confirmed</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                </div>
+            </div>-->
+            
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">All Painter Bookings</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Booking ID</th>
+                                    <th>Painter</th>
+                                    <th>Project Area</th>
+                                    <th>Completion Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if painter_bookings %}
+                                    {% for booking in painter_bookings %}
+                                    <tr>
+                                        <td>#{{ booking.id }}</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <span class="painter-status-indicator 
+                                                    {% if booking.painter.current_status == 'available' %}painter-status-available
+                                                    {% elif booking.painter.current_status == 'onproject' %}painter-status-onproject
+                                                    {% else %}painter-status-unavailable
+                                                    {% endif %}">
+                                                </span>
+                                                {% if booking.painter.userid.first_name or booking.painter.userid.last_name %}
+                                                    {{ booking.painter.userid.first_name }} {{ booking.painter.userid.last_name }}
+                                                {% else %}
+                                                    {{ booking.painter.userid.username }}
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                        <td>{{ booking.square_feet }} sq ft</td>
+                                        <td>{{ booking.project_completion_date|date:"d M Y" }}</td>
+                                        <td>
+                                            <span class="badge 
+                                                {% if booking.status == 'completed' %}bg-success
+                                                {% elif booking.status == 'confirmed' %}bg-info
+                                                {% else %}bg-warning
+                                                {% endif %}">
+                                                {{ booking.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-outline-success dropdown-toggle" type="button" id="dropdownMenuButton{{ booking.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    Actions
+                                                </button>
+                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ booking.id }}">
+                                                    <li><a class="dropdown-item" href="{% url 'Customer_painter_bookingDetail' booking.id %}">View Details</a></li>
+                                                    {% if booking.status != 'completed' %}
+                                                    <li><a class="dropdown-item" href="">Rate Painter</a></li><!--% url 'rate_painter' booking.id %-->
+                                                    {% endif %}
+                                                    {% if booking.status == 'pending' %}
+                                                    <li><a class="dropdown-item text-danger" href="{% url 'cancel_booking' booking.id %}">Cancel Booking</a></li>
+                                                    {% endif %}
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="6">
+                                            <div class="empty-state">
+                                                <i class="fas fa-paint-roller"></i>
+                                                <h4>No Painter Bookings Found</h4>
+                                                <p>You haven't booked any painters yet.</p>
+                                                <a href="" class="btn btn-success">Book a Painter</a><!--% url 'book_painter' %-->
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            
+            <!-- Painter Bookings Pagination -->
+            {% if painter_bookings.has_other_pages %}
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if painter_bookings.has_previous %}
+                        <li class="page-item"><a class="page-link" href="?page=1&tab=painters">&laquo; First</a></li>
+                        <li class="page-item"><a class="page-link" href="?page={{ painter_bookings.previous_page_number }}&tab=painters">Previous</a></li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">&laquo; First</span></li>
+                        <li class="page-item disabled"><span class="page-link">Previous</span></li>
+                    {% endif %}
+                    
+                    {% for i in painter_bookings.paginator.page_range %}
+                        {% if painter_bookings.number == i %}
+                            <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                        {% elif i > painter_bookings.number|add:'-3' and i < painter_bookings.number|add:'3' %}
+                            <li class="page-item"><a class="page-link" href="?page={{ i }}&tab=painters">{{ i }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if painter_bookings.has_next %}
+                        <li class="page-item"><a class="page-link" href="?page={{ painter_bookings.next_page_number }}&tab=painters">Next</a></li>
+                        <li class="page-item"><a class="page-link" href="?page={{ painter_bookings.paginator.num_pages }}&tab=painters">Last &raquo;</a></li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">Next</span></li>
+                        <li class="page-item disabled"><span class="page-link">Last &raquo;</span></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<!-- In your customer dashboard template -->
+<div class="card mb-3">
+    <div class="card-header">
+        <h5>Communication</h5>
+    </div>
+    <div class="card-body">
+        <a href="{% url 'chat:dashboard' %}" class="btn btn-primary btn-block">
+            <i class="fas fa-comments"></i> Chat with Painters & Field Staff
+            <span class="badge badge-light chat-unread-count"></span>
+        </a>
+    </div>
+</div>
+<!-- JavaScript for Tab Persistence and Filtering -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tab persistence
+        const urlParams = new URLSearchParams(window.location.search);
+        const tabParam = urlParams.get('tab');
+        
+        if (tabParam === 'painters') {
+            const paintersTab = document.getElementById('painters-tab');
+            bootstrap.Tab.getOrCreateInstance(paintersTab).show();
+        }
+        
+        // Remember active tab when clicking
+        const tabEls = document.querySelectorAll('button[data-bs-toggle="tab"]');
+        tabEls.forEach(tabEl => {
+            tabEl.addEventListener('shown.bs.tab', function (event) {
+                const id = event.target.id;
+                const tabName = id.replace('-tab', '');
+                
+                // Update URL without page reload
+                const url = new URL(window.location);
+                url.searchParams.set('tab', tabName);
+                
+                // Preserve the page parameter if it exists
+                if (url.searchParams.has('page')) {
+                    url.searchParams.set('page', '1');  // Reset to page 1 when switching tabs
+                }
+                
+                window.history.pushState({}, '', url);
+            });
+        });
+        
+        // Order status filter
+        const orderStatusFilter = document.getElementById('orderStatusFilter');
+        orderStatusFilter.addEventListener('change', function() {
+            const status = this.value;
+            const orderRows = document.querySelectorAll('#orders tbody tr');
+            
+            if (!status) {
+                // Show all rows if no filter selected
+                orderRows.forEach(row => {
+                    row.style.display = '';
+                });
+                return;
+            }
+            
+            orderRows.forEach(row => {
+                const statusCell = row.querySelector('td:nth-child(5)');
+                if (statusCell) {
+                    if (statusCell.textContent.toLowerCase().includes(status)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                }
+            });
+        });
+        
+        // Booking status filter
+        const bookingStatusFilter = document.getElementById('bookingStatusFilter');
+        bookingStatusFilter.addEventListener('change', function() {
+            const status = this.value;
+            const bookingRows = document.querySelectorAll('#painters tbody tr');
+            
+            if (!status) {
+                // Show all rows if no filter selected
+                bookingRows.forEach(row => {
+                    row.style.display = '';
+                });
+                return;
+            }
+            
+            bookingRows.forEach(row => {
+                const statusCell = row.querySelector('td:nth-child(5)');
+                if (statusCell) {
+                    if (statusCell.textContent.toLowerCase().includes(status)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock %}

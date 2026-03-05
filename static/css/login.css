@@ -1,0 +1,166 @@
+/* Navbar Styling */
+.navbar {
+    background-color: #333;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+  }
+  
+  .navbar .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .navbar-menu {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .navbar-menu li {
+    margin-left: 20px;
+  }
+  
+  .navbar-menu a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 16px;
+  }
+  
+  .navbar-menu a:hover {
+    text-decoration: underline;
+  }
+  
+  /* Dropdown Menu */
+  .dropdown-menu {
+    display: none;
+    position: absolute;
+    background-color: #444;
+    list-style: none;
+    padding: 10px 0;
+  }
+  
+  .dropdown:hover .dropdown-menu {
+    display: block;
+  }
+  
+  .dropdown-menu li {
+    padding: 5px 20px;
+  }
+  
+  .dropdown-menu a {
+    color: #fff;
+    text-decoration: none;
+  }
+  
+  .dropdown-menu a:hover {
+    background-color: #555;
+  }
+  
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background: url('../images/shadestore.png') no-repeat center center/cover;  /* Add your desired background image URL here */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 0%;
+    height: 100vh;
+    background-size: cover;  /* Ensures the background covers the entire viewport */
+}
+.container {
+    width: 350px;
+    perspective: 1000px;
+}
+
+.form-container {
+    position: relative;
+    width: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+}
+
+.form-box {
+    position: absolute;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.form-box h1 {
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.form-box input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: none;
+    outline: none;
+    border-radius: 5px;
+    box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.2);
+}
+
+.form-box input[type="submit"] {
+    background: #ff6f61;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.form-box input[type="submit"]:hover {
+    background: #ff3b2e;
+    transform: scale(1.05);
+}
+
+.form-box a {
+    display: block;
+    margin-top: 10px;
+    color: #333;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.form-box a:hover {
+    color: #ff3b2e;
+}
+
+.switch {
+    margin-top: 15px;
+    color: #333;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.switch:hover {
+    color: #ff3b2e;
+}
+
+.signup-form {
+    transform: rotateY(180deg);
+    visibility: hidden; /* Hide signup form initially */
+}
+
+.container.flip .form-container {
+    transform: rotateY(180deg);
+}
+
+.container.flip .signup-form {
+    visibility: visible; /* Show signup form after flipping */
+}

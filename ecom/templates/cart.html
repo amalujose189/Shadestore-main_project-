@@ -1,0 +1,122 @@
+{% extends 'main.html' %}
+
+{% block title %}Your Cart - ShadeStore{% endblock %}
+
+{% block content %}
+<div class="container py-5 mt-5">
+    <h2 class="mb-4">Your Shopping Cart</h2>
+    
+    {% if cart_items %}
+        <div class="row">
+            <!-- Cart Items -->
+            <div class="col-lg-8">
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-body">
+                        {% for item in cart_items %}
+                            <div class="row mb-4">
+                                <div class="col-md-2 col-4">
+                                    {% if item.product.main_image %}
+                                        <img src="{{ item.product.main_image.url }}" alt="{{ item.product.product_name }}" class="img-fluid rounded">
+                                    {% else %}
+                                        <div class="no-image bg-light rounded d-flex justify-content-center align-items-center" style="height: 80px;">
+                                            <p class="text-muted small">No image</p>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-10 col-8">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-1">
+                                            <a href="{% url 'product_detail' item.product.id %}" class="text-decoration-none text-dark">
+                                                {{ item.product.product_name }}
+                                            </a>
+                                        </h5>
+                                        <div>
+                                            <span class="text-primary fw-bold">₹{{ item.subtotal }}</span>
+                                        </div>
+                                    </div>
+                                    <p class="text-muted mb-1">Category: {{ item.product.category.category_name }}</p>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="me-2">
+                                            <div class="shade-circle d-inline-block"
+                                                style="width: 20px; height: 20px; border-radius: 50%; 
+                                                    background-color: {{ item.color }}; border: 1px solid #ddd;">
+                                            </div>
+                                        </div>
+                                        <span class="text-muted small">Shade: {{ item.color_name }}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="d-flex align-items-center">
+                                            <form method="post" action="{% url 'update_cart' item.id %}" class="d-flex align-items-center quantity-form"><!--% url 'update_cart' item.id %-->
+                                                {% csrf_token %}
+                                                <button type="submit" name="action" value="decrease" class="btn btn-sm btn-outline-secondary me-2">-</button>
+                                                <span class="mx-2">{{ item.quantity }}</span>
+                                                <button type="submit" name="action" value="increase" class="btn btn-sm btn-outline-secondary ms-2">+</button>
+                                            </form>
+                                        </div>
+                                        <form method="post" action="{% url 'remove_from_cart' item.id %}"><!--% url 'remove_from_cart' item.id %-->
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm text-danger">
+                                                <i class="fas fa-trash"></i> Remove
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            {% if not forloop.last %}
+                                <hr>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Order Summary -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">Order Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Subtotal</span>
+                            <span>₹{{ cart_total }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Delivery Charges</span>
+                            <span>₹{{ delivery_charges|default:"0" }}</span>
+                        </div>
+                        {% if discount_amount > 0 %}
+                        <div class="d-flex justify-content-between mb-2 text-success">
+                            <span>Discount</span>
+                            <span>-₹{{ discount_amount }}</span>
+                        </div>
+                        {% endif %}
+                        <hr>
+                        <div class="d-flex justify-content-between mb-2 fw-bold">
+                            <span>Total</span>
+                            <span>₹{{ grand_total|default:cart_total }}</span>
+                        </div>
+                        <div class="d-grid gap-2 mt-3">
+                            <a href="{% url 'checkout' %}" class="btn btn-primary">Proceed to Checkout</a><!--% url 'checkout' %-->
+                            <a href="{% url 'index' %}" class="btn btn-outline-secondary">Continue Shopping</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="row">
+            <div class="col-md-12 text-center py-5">
+                <div class="card shadow-sm">
+                    <div class="card-body py-5">
+                        <i class="fas fa-shopping-cart fa-4x text-muted mb-3"></i>
+                        <h3>Your cart is empty</h3>
+                        <p class="text-muted">You have no items in your shopping cart.<br>Browse our collection and add your favorite shades.</p>
+                        <a href="{% url 'index' %}" class="btn btn-primary mt-3">Continue Shopping</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

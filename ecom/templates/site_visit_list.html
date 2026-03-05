@@ -1,0 +1,213 @@
+{% extends 'fieldstaff_dash.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    .container {
+        font-family: Arial, sans-serif;
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+        color: #2c3e50;
+        font-size: 24px;
+        margin-bottom: 20px;
+        font-weight: bold;
+    }
+
+    .btn-download, .btn-print {
+        background-color: #2563eb;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 5px;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 14px;
+        margin-bottom: 10px;
+        cursor: pointer;
+    }
+
+    .btn-download:hover, .btn-print:hover {
+        background-color: #1d4ed8;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: white;
+        border-radius: 8px;
+        overflow: hidden;
+        margin-top: 10px;
+    }
+
+    th, td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #f4f4f4;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .print-modal {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        border-radius: 8px;
+        z-index: 1000;
+    }
+
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.3);
+        z-index: 999;
+    }
+</style>
+
+<div class="container">
+    <h1>Site Visits</h1>
+
+    <a href="{% url 'download_site_visits_csv' %}" class="btn-download">
+        <i class="fas fa-download"></i> Download as CSV
+    </a>
+    <button class="btn-print" onclick="openPrintModal()">Print Document</button>
+
+    <table id="siteVisitTable">
+        <thead>
+            <tr>
+                <th>Owner Name</th>
+                <th>Visit Date</th>
+                <th>City</th>
+                <th>Phone</th>
+                <th>Square Feet</th>
+                <th>Stage of Construction</th>
+                <th>Proposed Visit Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for site_visit in site_visits %}
+            <tr data-visit-date="{{ site_visit.visit_date|date:'Y-m-d' }}">
+                <td>{{ site_visit.owner_name }}</td>
+                <td>{{ site_visit.visit_date|date:'Y-m-d' }}</td>
+                <td>{{ site_visit.city }}</td>
+                <td>{{ site_visit.phone }}</td>
+                <td>{{ site_visit.square_feet }}</td>
+                <td>{{ site_visit.get_stage_of_construction_display }}</td>
+                <td>{{ site_visit.proposed_date_visit|date:'Y-m-d' }}</td>
+                <td class="actions">
+                    <a href="{% url 'site_visit_detailView' site_visit.pk %}" class="view">View</a>
+                    <a href="{% url 'edit_site_visit' site_visit.pk %}" class="edit">Edit</a>
+                    <a href="{% url 'delete_site_visit' site_visit.pk %}" class="delete">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Print Modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="closePrintModal()"></div>
+<div class="print-modal" id="printModal">
+    <h2>Select Print Option</h2>
+    <label><input type="radio" name="printOption" value="all" checked> Print All</label><br>
+    <label><input type="radio" name="printOption" value="date"> Date Based <sub>(for select multiple date:ctrl+click)</sub></label>
+    <select id="printDateSelect" multiple disabled>
+        {% regroup site_visits by visit_date|date:'Y-m-d' as visit_dates %}
+        {% for date_group in visit_dates %}
+            <option value="{{ date_group.grouper }}">{{ date_group.grouper }}</option>
+        {% endfor %}
+    </select>
+    <br><br>
+    <button onclick="printDocument()">Print</button>
+    <button onclick="closePrintModal()">Cancel</button>
+</div>
+
+<script>
+    function openPrintModal() {
+        document.getElementById("printModal").style.display = "block";
+        document.getElementById("modalOverlay").style.display = "block";
+    }
+
+    function closePrintModal() {
+        document.getElementById("printModal").style.display = "none";
+        document.getElementById("modalOverlay").style.display = "none";
+    }
+
+    document.querySelectorAll("input[name='printOption']").forEach(radio => {
+        radio.addEventListener("change", function() {
+            document.getElementById("printDateSelect").disabled = this.value !== "date";
+        });
+    });
+
+    function printDocument() {
+        let printOption = document.querySelector("input[name='printOption']:checked").value;
+        let selectedDates = Array.from(document.getElementById("printDateSelect").selectedOptions).map(option => option.value);
+
+        let url = `/fetch-print-data/?print_option=${printOption}`;
+        if (printOption === "date" && selectedDates.length > 0) {
+            url += `&selected_dates=${encodeURIComponent(selectedDates.join(","))}`;
+        }
+
+        fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            if (!data.site_visits || data.site_visits.length === 0) {
+                alert("No data available for the selected criteria.");
+                return;
+            }
+
+            let printContent = `
+                <h2>Site Visits</h2>
+                <table border='1'>
+                    <tr>
+                        <th>Owner Name</th>
+                        <th>Visit Date</th>
+                        <th>City</th>
+                        <th>Phone</th>
+                        <th>Square Feet</th>
+                        <th>Stage of Construction</th>
+                        <th>Proposed Visit Date</th>
+                    </tr>
+                    ${data.site_visits.map(visit => `
+                        <tr>
+                            <td>${visit.owner_name || "N/A"}</td>
+                            <td>${visit.visit_date || "N/A"}</td>
+                            <td>${visit.city || "N/A"}</td>
+                            <td>${visit.phone || "N/A"}</td>
+                            <td>${visit.square_feet || "N/A"}</td>
+                            <td>${visit.stage_of_construction || "N/A"}</td>
+                            <td>${visit.proposed_date_visit || "N/A"}</td>
+                        </tr>
+                    `).join("")}
+                </table>
+            `;
+
+            let newWindow = window.open("", "", "width=800,height=600");
+            newWindow.document.write(printContent);
+            newWindow.document.close();
+            newWindow.print();
+        })
+        .catch(error => console.error("Error fetching print data:", error));
+    }
+</script>
+
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %}
+
+{% block content %}
+<div id="content" class="change-form">
+    <h1>Reassign Order #{{ order.id }}</h1>
+    <div class="module">
+        <form method="post" id="order_form" class="form-horizontal">
+            {% csrf_token %}
+            <fieldset class="module aligned">
+                <div class="form-row">
+                    <label><strong>Customer:</strong></label>
+                    <div>
+                        {% if order.customer %}
+                            {{ order.customer }}
+                        {% else %}
+                            No customer information
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <label><strong>Location:</strong></label>
+                    <div>
+                        {% if order.customer.city or order.customer.state %}
+                            {{ order.customer.city }}{% if order.customer.city and order.customer.state %}, {% endif %}{{ order.customer.state }}
+                        {% else %}
+                            No location information
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <label><strong>Order Amount:</strong></label>
+                    <div>₹{{ order.total_amount }}</div>
+                </div>
+                <div class="form-row">
+                    <label><strong>Currently Assigned To:</strong></label>
+                    <div>{{ current_staff.userid.username }} ({{ current_staff.assigned_area }})</div>
+                </div>
+                <div class="form-row">
+                    <label><strong>Current Delivery Date:</strong></label>
+                    <div>{{ order.delivery_date|default:"Not set" }}</div>
+                </div>
+                <div class="form-row">
+                    {{ form.field_staff.errors }}
+                    <label for="id_field_staff">{{ form.field_staff.label }}:</label>
+                    <div>
+                        {{ form.field_staff }}
+                        {% if form.field_staff.help_text %}
+                            <p class="help">{{ form.field_staff.help_text }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="form-row">
+                    {{ form.delivery_date.errors }}
+                    <label for="id_delivery_date">
+                        {% if order.delivery_date %}
+                            Update Delivery Date:
+                        {% else %}
+                            Set Delivery Date:
+                        {% endif %}
+                    </label>
+                    <div>
+                        {{ form.delivery_date }}
+                        {% if form.delivery_date.help_text %}
+                            <p class="help">{{ form.delivery_date.help_text }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </fieldset>
+            <div class="submit-row">
+                <input type="submit" value="Reassign" class="default" />
+                <a href="{% url 'admin:ecom_order_changelist' %}" class="button cancel-link">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/changelists.css' %}">
+{% endblock %}
+
+{% block extrajs %}
+    {{ block.super }}
+    <script type="text/javascript" src="{% static 'admin/js/core.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/admin/RelatedObjectLookup.js' %}"></script>
+{% endblock %}

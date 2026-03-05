@@ -1,0 +1,520 @@
+{% extends 'fieldstaff_dash.html' %}
+
+{% block content %}
+
+<style>
+    /* General Styling */
+    body {
+        background-color: #f8f9fa;
+    }
+
+    .container-fluid {
+        padding: 1.5rem;
+    }
+
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        border: 1px solid #e3e6f0;
+        background-color: #ffffff;
+    }
+
+    .card-header {
+        border-top-left-radius: 10px !important;
+        border-top-right-radius: 10px !important;
+        font-weight: 500;
+        padding: 12px 20px;
+        background-color: #4e73df;
+        color: white;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    /* Table Styling */
+    .table {
+        margin-bottom: 0;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    .table th {
+        font-weight: 600;
+        background-color: #f8f9fa;
+        color: #495057;
+        text-align: left;
+    }
+
+    .table td, .table th {
+        padding: 12px 15px;
+        vertical-align: middle;
+        border: 1px solid #dee2e6;
+    }
+
+    /* Badge Styling */
+    .badge {
+        padding: 6px 10px;
+        font-weight: 500;
+        font-size: 0.8rem;
+        border-radius: 4px;
+    }
+
+    .badge.bg-success {
+        background-color: #1cc88a !important;
+        color: white;
+    }
+
+    .badge.bg-warning {
+        background-color: #f6c23e !important;
+        color: #212529;
+    }
+
+    .badge.bg-info {
+        background-color: #36b9cc !important;
+        color: white;
+    }
+
+    .badge.bg-secondary {
+        background-color: #858796 !important;
+        color: white;
+    }
+
+    .badge.bg-danger {
+        background-color: #e74a3b !important;
+        color: white;
+    }
+
+    /* Timeline Styling */
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 10px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background-color: #e3e6f0;
+    }
+
+    .timeline-item {
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+    .timeline-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -30px;
+        top: 5px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: #4e73df;
+    }
+
+    .timeline-date {
+        font-size: 0.8rem;
+        color: #858796;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    /* Order Detail Styling */
+    .order-details-section {
+        margin-bottom: 20px;
+    }
+
+    .order-detail-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .order-detail-item span:first-child {
+        font-weight: 500;
+        min-width: 120px;
+        margin-right: 10px;
+    }
+
+    .order-detail-item span:last-child {
+        text-align: right;
+    }
+
+    .order-detail-item:last-child {
+        border-bottom: none;
+    }
+
+    /* Form Styling */
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .form-control, .form-select {
+        display: block;
+        width: 100%;
+        padding: 0.375rem 0.75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        color: #495057;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+
+    .btn-primary {
+        background-color: #4e73df;
+        border-color: #4e73df;
+        color: white;
+        padding: 0.375rem 0.75rem;
+        border-radius: 0.25rem;
+    }
+
+    /* Textarea specific styling */
+    textarea.form-control {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+    /* Delivery Prediction Styling */
+    .delivery-prediction {
+        padding: 12px 15px;
+        background-color: #e8f4fd;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        border-left: 4px solid #4e73df;
+    }
+
+    .delivery-prediction i {
+        color: #4e73df;
+        margin-right: 8px;
+    }
+
+    .delivery-prediction .date {
+        font-weight: 600;
+        color: #1e40af;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .container-fluid {
+            padding: 10px;
+        }
+
+        .card {
+            margin-bottom: 15px;
+        }
+
+        .table-responsive {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .order-detail-item {
+            flex-direction: column;
+        }
+
+        .order-detail-item span:first-child {
+            margin-bottom: 5px;
+        }
+
+        .order-detail-item span:last-child {
+            text-align: left;
+        }
+    }
+    
+    /* Dotted line for future delivery */
+    .timeline-item.future-delivery::before {
+        background-color: transparent;
+        border: 2px dotted #ccc;
+    }
+    
+    .timeline-item.future-delivery .timeline-content {
+        opacity: 0.7;
+    }
+    
+    /* Update the main timeline vertical line for better contrast */
+    .timeline::before {
+        background-color: #d1d3e2;
+        width: 2px;
+    }
+    
+    /* Success message styling */
+    .delivery-success-message {
+        background-color: #e8f5e9;
+        border-left: 4px solid #1cc88a;
+        padding: 10px 15px;
+        margin-bottom: 20px;
+        border-radius: 4px;
+        display: none;
+    }
+    
+    /* Show success message when delivery status is delivered */
+    {% if order.status_delivery == 'delivered' %}
+    .delivery-success-message {
+        display: block;
+    }
+    {% endif %}
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Order #{{ order.id }} Details</h4>
+                </div>
+                <div class="card-body">
+                    <div class="order-details-section">
+                        <h5>Customer Information</h5>
+                        <div class="order-detail-item">
+                            <span>Customer:</span>
+                            <span>
+                                {% with user=order.customer.userid %}
+                                    {% if user.first_name or user.last_name %}
+                                        {{ user.first_name }} {{ user.last_name }}
+                                    {% else %}
+                                        {{ user.username }}
+                                    {% endif %}
+                                {% endwith %}
+                            </span>
+                        </div>
+                        <div class="order-detail-item">
+                            <span>Phone:</span>
+                            <span>{{ order.customer.phone }}</span>
+                        </div>
+                        <div class="order-detail-item">
+                            <span>Location:</span>
+                            <span>{{ order.customer.city }}, {{ order.customer.state }}</span>
+                        </div>
+                        {% if order.customer.approched_by_staff and order.customer.staff_member %}
+                        <div class="order-detail-item">
+                            <span>Approached By:</span>
+                            <span>{{ order.customer.get_staff_details }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="order-details-section">
+                        <h5>Order Information</h5>
+                        <div class="order-detail-item">
+                            <span>Order Date:</span>
+                            <span>{{ order.date|date:"d M Y" }}</span>
+                        </div>
+                        <div class="order-detail-item">
+                            <span>Payment Method:</span>
+                            <span>
+                                <span class="badge {% if order.payment_method == 'cod' %}bg-warning{% else %}bg-success{% endif %}">
+                                    {{ order.get_payment_method_display }}
+                                </span>
+                            </span>
+                        </div>
+                        <div class="order-detail-item">
+                            <span>Total Amount:</span>
+                            <span>₹{{ order.total_amount }}</span>
+                        </div>
+                        <div class="order-detail-item">
+                            <span>Status:</span>
+                            <span>
+                                <span class="badge 
+                                    {% if order.status_delivery == 'delivered' %}bg-success
+                                    {% elif order.status_delivery == 'pending' %}bg-warning
+                                    {% elif order.status_delivery == 'shipped' %}bg-info
+                                    {% elif order.status_delivery == 'cancelled' %}bg-danger
+                                    {% else %}bg-secondary
+                                    {% endif %}">
+                                    {{ order.get_status_delivery_display }}
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+
+                    {% if order.status_delivery == 'pending' or order.status_delivery == 'shipped' %}
+                    <div class="delivery-prediction">
+                        <h5><i class="fas fa-truck"></i> Delivery Prediction</h5>
+                        <div class="mb-3">
+                            <h5>Expected Delivery Date</h5>
+                            <p class="date">{{ order.delivery_date|date:'d M Y'|default:"Not yet scheduled" }}</p>
+                            <small class="text-muted">This date is set by the warehouse team and cannot be changed.</small>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="delivery-status-form">
+                        <h5>Update Delivery Status</h5>
+                        <form method="post" action="{% url 'assigned_order_detail' order.id %}">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="status_delivery" class="form-label">Delivery Status</label>
+                                {% if order.status_delivery == 'shipped' %}
+                                <select name="status_delivery" id="status_delivery" class="form-select">
+                                    <option value="shipped" selected>Shipped</option>
+                                    <option value="delivered">Delivered</option>
+                                    <option value="cancelled">Cancelled</option>
+                                </select>
+                                {% elif order.status_delivery == 'pending' %}
+                                <div class="alert alert-info">
+                                    This order is pending. You can only mark it as delivered once it has been shipped by the warehouse.
+                                </div>
+                                <select name="status_delivery" id="status_delivery" class="form-select" disabled>
+                                    <option value="pending" selected>Pending</option>
+                                </select>
+                                <input type="hidden" name="status_delivery" value="pending">
+                                {% else %}
+                                <select name="status_delivery" id="status_delivery" class="form-select">
+                                    <option value="delivered" {% if order.status_delivery == 'delivered' %}selected{% endif %}>Delivered</option>
+                                    <option value="cancelled" {% if order.status_delivery == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                                </select>
+                                {% endif %}
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">Update Status</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">Order Items</h4>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Color</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in order.items.all %}
+                                <tr>
+                                    <td>{{ item.product.product_name }}</td>
+                                    <td>{% if item.color %}{{ item.color }}{% else %}N/A{% endif %}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>₹{{ item.product.price }}</td>
+                                    <td>₹{{ item.subtotal }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot class="bg-light">
+                                <tr>
+                                    <td colspan="4" class="text-end fw-bold">Total:</td>
+                                    <td class="fw-bold">₹{{ order.total_amount }}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">Delivery Status Timeline</h4>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <span class="timeline-date">{{ order.date|date:"d M Y" }}</span>
+                            <div class="timeline-content">
+                                <span class="badge bg-secondary">Order Placed</span>
+                                <p>Order #{{ order.id }} was placed by customer</p>
+                            </div>
+                        </div>
+                        
+                        {% if order.status_delivery != 'pending' %}
+                        <div class="timeline-item">
+                            <span class="timeline-date">{{ order.created_at|date:"d M Y H:i" }}</span>
+                            <div class="timeline-content">
+                                <span class="badge bg-info">Shipped</span>
+                                <p>Order has been shipped and is on the way to customer</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if order.shipped_date %}
+                        <div class="timeline-item">
+                            <span class="timeline-date">{{ order.shipped_date|date:"d M Y" }}</span>
+                            <div class="timeline-content">
+                                <span class="badge bg-info">Shipped</span>
+                                <p>Order has been shipped and is on the way to customer</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if order.predicted_delivery_date and order.status_delivery != 'delivered' and order.status_delivery != 'cancelled' %}
+                        <div class="timeline-item">
+                            <span class="timeline-date">{{ order.predicted_delivery_date|date:"d M Y" }}</span>
+                            <div class="timeline-content">
+                                <span class="badge bg-secondary">Expected Delivery</span>
+                                <p>Expected to be delivered on this date</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Delivered timeline (Shows as colorless with dotted line when not yet delivered) -->
+                        <div class="timeline-item {% if order.status_delivery != 'delivered' %}future-delivery{% endif %}">
+                            <span class="timeline-date">
+                                {% if order.delivery_date %}
+                                    {{ order.delivery_date|date:"d M Y" }}
+                                {% else %}
+                                    {{ order.predicted_delivery_date|date:"d M Y"|default:"Pending" }}
+                                {% endif %}
+                            </span>
+                            <div class="timeline-content">
+                                <span class="badge {% if order.status_delivery == 'delivered' %}bg-success{% else %}bg-light text-secondary{% endif %}">
+                                    {% if order.status_delivery == 'delivered' %}Delivered{% else %}delivered within this date{% endif %}
+                                </span>
+                                <p>
+                                    {% if order.status_delivery == 'delivered' %}
+                                        Order has been successfully delivered to the customer
+                                    {% else %}
+                                        Estimated delivery date - status pending confirmation
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        {% if order.status_delivery == 'cancelled' %}
+                        <div class="timeline-item">
+                            <span class="timeline-date">{% now "d M Y H:i" %}</span>
+                            <div class="timeline-content">
+                                <span class="badge bg-danger">Cancelled</span>
+                                <p>Order has been cancelled</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Success message that shows only when order is delivered -->
+                <div class="delivery-success-message">
+                    <i class="fas fa-check-circle text-success"></i>
+                    <span class="ml-2">Order delivered successfully to the customer!</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

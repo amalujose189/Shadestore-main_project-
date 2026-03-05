@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+        }
+        .content {
+            padding: 20px;
+        }
+        .footer {
+            background-color: #f1f1f1;
+            padding: 10px;
+            text-align: center;
+            border-radius: 0 0 5px 5px;
+        }
+        .button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            text-decoration: none;
+            display: inline-block;
+            border-radius: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table td, table th {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>New Order Received</h2>
+        </div>
+        <div class="content">
+            <p>Dear Admin,</p>
+            <p>A new order has been placed on ShadeStore.</p>
+            
+            <h3>Order Details:</h3>
+            <table>
+                <tr>
+                    <td><strong>Order ID:</strong></td>
+                    <td>#{{ order.id }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Customer:</strong></td>
+                    <td>{{ order.customer.userid.username }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Amount:</strong></td>
+                    <td>₹{{ order.total_amount }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Date:</strong></td>
+                    <td>{{ order.date }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Status:</strong></td>
+                    <td>{{ order.status }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Location:</strong></td>
+                    <td>{{ order.customer.city }}, {{ order.customer.state }}</td>
+                </tr>
+            </table>
+            
+            <p>This order requires assignment to a field staff member for delivery.</p>
+            
+            <p style="text-align: center; margin-top: 20px;">
+                <a href="{{ admin_url }}" class="button">View Order in Admin</a>
+            </p>
+        </div>
+        <div class="footer">
+            <p>&copy; {{ current_year }} ShadeStore. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,297 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f5f5f5;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Dashboard Container */
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    width: 280px;
+    background: #2c3e50;
+    color: #fff;
+    transition: all 0.3s;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+/* Hamburger Menu (hidden by default on desktop) */
+.hamburger-menu {
+    display: none;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    padding: 15px;
+    cursor: pointer;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    z-index: 1000;
+}
+
+/* Profile Section */
+.profile-section {
+    padding: 30px 20px;
+    text-align: center;
+    border-bottom: 1px solid #34495e;
+}
+
+.profile-pic {
+    margin-bottom: 15px;
+}
+
+.profile-name {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.profile-email {
+    font-size: 14px;
+    color: #bdc3c7;
+}
+
+/* Sidebar Menu */
+.sidebar-menu {
+    list-style: none;
+    padding: 20px 0;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.sidebar-menu li {
+    margin-bottom: 5px;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    color: #ecf0f1;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.menu-item:hover {
+    background: #34495e;
+    color: #fff;
+}
+
+.menu-item i {
+    margin-right: 15px;
+    font-size: 18px;
+    width: 24px;
+    text-align: center;
+}
+
+.menu-item span {
+    flex-grow: 1;
+}
+
+.menu-item sub {
+    font-size: 0.7em;
+    color: #bdc3c7;
+    display: block;
+    margin-top: 3px;
+}
+
+/* Logout Item Specific Styles */
+.logout-item {
+    margin-top: auto;
+    border-top: 1px solid #34495e;
+    padding-top: 10px;
+}
+
+.logout-item .menu-item {
+    color: #e74c3c;
+}
+
+.logout-item .menu-item:hover {
+    background: rgba(231, 76, 60, 0.1);
+}
+
+/* Main Content Styles */
+.main-content {
+    flex-grow: 1;
+    padding: 20px;
+    background: #f9f9f9;
+    overflow-y: auto;
+    height: 100vh;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 0;
+        overflow: hidden;
+        position: fixed;
+        z-index: 100;
+        height: 100%;
+    }
+
+    .sidebar.active {
+        width: 280px;
+    }
+
+    .hamburger-menu {
+        display: block;
+    }
+
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+    }
+}
+
+/* Content Block Styles */
+.content-block {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.content-block h2 {
+    margin-bottom: 20px;
+    color: #2c3e50;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+/* Form Styles */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.btn {
+    padding: 10px 20px;
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s;
+}
+
+.btn:hover {
+    background: #2980b9;
+}
+
+.btn-danger {
+    background: #e74c3c;
+}
+
+.btn-danger:hover {
+    background: #c0392b;
+}
+
+/* Table Styles */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.table th, .table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.table th {
+    background: #f2f2f2;
+    font-weight: 600;
+}
+
+.table tr:hover {
+    background: #f9f9f9;
+}
+
+/* Status Badges */
+.badge {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.badge-success {
+    background: #d4edda;
+    color: #155724;
+}
+
+.badge-warning {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.badge-danger {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* Utility Classes */
+.text-center {
+    text-align: center;
+}
+
+.mt-20 {
+    margin-top: 20px;
+}
+
+.mb-20 {
+    margin-bottom: 20px;
+}
+
+/* Animation for sidebar items */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.sidebar-menu li {
+    animation: fadeIn 0.3s ease forwards;
+    opacity: 0;
+}
+
+.sidebar-menu li:nth-child(1) { animation-delay: 0.1s; }
+.sidebar-menu li:nth-child(2) { animation-delay: 0.2s; }
+.sidebar-menu li:nth-child(3) { animation-delay: 0.3s; }
+.sidebar-menu li:nth-child(4) { animation-delay: 0.4s; }
+.sidebar-menu li:nth-child(5) { animation-delay: 0.5s; }
+.sidebar-menu li:nth-child(6) { animation-delay: 0.6s; }
+.sidebar-menu li:nth-child(7) { animation-delay: 0.7s; }
+.sidebar-menu li:nth-child(8) { animation-delay: 0.8s; }

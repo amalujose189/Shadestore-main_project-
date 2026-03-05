@@ -1,0 +1,37 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls %}
+
+{% block content %}
+<div id="content-main">
+  <form method="post">
+    {% csrf_token %}
+    <div>
+      <fieldset class="module aligned">
+        <h2>Assign Multiple Orders to Field Staff</h2>
+        <div class="description">
+          You are about to assign {{ orders|length }} orders to a field staff member.
+        </div>
+        
+        <div class="form-row">
+          {{ form.field_staff.errors }}
+          <label for="id_field_staff">{{ form.field_staff.label }}:</label>
+          {{ form.field_staff }}
+        </div>
+        
+        <h3>Selected Orders</h3>
+        <ul>
+          {% for order in orders %}
+            <li>Order #{{ order.id }} - {{ order.customer }} ({{ order.customer.city }}, {{ order.customer.state }})</li>
+          {% endfor %}
+        </ul>
+      </fieldset>
+      
+      <div class="submit-row">
+        <input type="hidden" name="action" value="bulk_assign_orders" />
+        <input type="submit" name="apply" value="Assign Orders" class="default" />
+        <a href="{% url 'admin:ecom_order_changelist' %}" class="button cancel-link">Cancel</a>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

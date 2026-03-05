@@ -1,0 +1,121 @@
+.profile-card {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    background: #ffffff;
+    margin: 20px 0;
+    border: none;
+}
+
+.profile-card .card-body {
+    padding: 2rem;
+}
+
+/* Section headers */
+.section-header {
+    color: #2c3e50;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e9ecef;
+}
+
+/* Form group styling */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    font-weight: 500;
+    color: #495057;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.form-control {
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    padding: 0.75rem;
+    font-size: 1rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:focus {
+    border-color: #80bdff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Read-only information styling */
+.readonly-info {
+    background-color: #f8f9fa;
+    padding: 0.75rem;
+    border-radius: 4px;
+    border: 1px solid #e9ecef;
+    margin-bottom: 1rem;
+}
+
+.readonly-info label {
+    font-weight: 500;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+}
+
+.readonly-info p {
+    margin: 0;
+    color: #212529;
+    font-size: 1rem;
+}
+
+/* Button styling */
+.btn-update {
+    background-color: #007bff;
+    border: none;
+    padding: 0.75rem 2rem;
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: 4px;
+    transition: background-color 0.15s ease-in-out;
+}
+
+.btn-update:hover {
+    background-color: #0056b3;
+}
+
+/* Alert messages styling */
+.alert {
+    border-radius: 4px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+}
+
+.alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
+/* Error message styling */
+.error-text {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .profile-card .card-body {
+        padding: 1rem;
+    }
+    
+    .btn-update {
+        width: 100%;
+    }
+}

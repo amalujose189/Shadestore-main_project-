@@ -1,0 +1,56 @@
+{% extends 'fieldstaff_dash.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-lg mx-auto bg-white rounded-lg shadow-md p-6">
+        <div class="text-center">
+            <!-- Warning Icon -->
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+            </div>
+
+            <h2 class="text-xl font-bold text-gray-900 mb-4">Confirm Delete</h2>
+            
+            <p class="text-gray-600 mb-6">
+                Are you sure you want to delete the site visit for:<br>
+                <span class="font-semibold text-gray-800">{{ site_visit.site_address }}, {{ site_visit.city }}</span><br>
+                <span class="text-sm text-gray-500">Visit Date: {{ site_visit.visit_date }}</span>
+            </p>
+
+            <div class="mt-4 space-y-2">
+                <!-- Delete Form -->
+                <form method="post" class="inline-block">
+                    {% csrf_token %}
+                    
+                    <div class="flex flex-col sm:flex-row justify-center gap-3">
+                        <!-- Cancel Button -->
+                        <a href="{% url 'site_visit_detail' pk=site_visit.visit_id %}" 
+                           class="inline-flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                            Cancel
+                        </a>
+
+                        <!-- Delete Button -->
+                        <button type="submit" 
+                                class="inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                            Delete Site Visit
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Additional Information -->
+            <div class="mt-6 text-sm text-gray-500">
+                <p>This action cannot be undone.</p>
+                {% if site_visit.comments %}
+                    <div class="mt-4 p-4 bg-gray-50 rounded-md">
+                        <p class="font-medium text-gray-700">Visit Comments:</p>
+                        <p class="mt-1">{{ site_visit.comments }}</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

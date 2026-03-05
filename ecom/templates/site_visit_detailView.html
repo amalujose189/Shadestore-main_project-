@@ -1,0 +1,62 @@
+{% extends 'fieldstaff_dash.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    .container {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+        color: #2c3e50;
+        font-size: 24px;
+        margin-bottom: 20px;
+        font-weight: bold;
+    }
+
+    .details {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .details strong {
+        color: #2c3e50;
+    }
+
+    .btn-back {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 15px;
+        background-color: #2563eb;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+    }
+
+    .btn-back:hover {
+        background-color: #1d4ed8;
+    }
+</style>
+
+<div class="container">
+    <h1>Site Visit Details</h1>
+    <div class="details"><strong>Visit Date:</strong> {{ site_visit.visit_date }}</div>
+    <div class="details"><strong>Site Address:</strong> {{ site_visit.site_address }}</div>
+    <div class="details"><strong>City:</strong> {{ site_visit.city }}</div>
+    <div class="details"><strong>Owner Name:</strong> {{ site_visit.owner_name }}</div>
+    <div class="details"><strong>Phone:</strong> {{ site_visit.phone }}</div>
+    <div class="details"><strong>Square Feet:</strong> {{ site_visit.square_feet }}</div>
+    <div class="details"><strong>Stage of Construction:</strong> {{ site_visit.get_stage_of_construction_display }}</div>
+    <div class="details"><strong>Proposed Visit Date:</strong> {{ site_visit.proposed_date_visit }}</div>
+    <div class="details"><strong>Large Project:</strong> {% if site_visit.large_project %} Yes {% else %} No {% endif %}</div>
+    <div class="details"><strong>Comments:</strong> {{ site_visit.comments|default:"-" }}</div>
+
+    <a href="{% url 'site_visit_list' %}" class="btn-back">Back to List</a>
+</div>
+{% endblock %}

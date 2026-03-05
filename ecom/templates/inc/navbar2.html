@@ -1,0 +1,120 @@
+{% load user_role_tags %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'index' %}">ShadeStore</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <!-- Search Bar -->
+        <div class="d-flex mx-auto search-container" style="width: 50%;">
+            <form class="d-flex w-100" action="{% url 'search_products' %}" method="GET">
+                <div class="input-group">
+                    <select class="form-select bg-light border-0" name="category" id="category-select" style="max-width: 150px;">
+                        <option value="all" selected>All Categories</option>
+                        {% for category in categories %}
+                            <option value="{{ category.id }}">{{ category.category_name }}</option>
+                        {% endfor %}
+                    </select>
+                    <input class="form-control" type="search" name="q" placeholder="Search products..." aria-label="Search" required>
+                    <button class="btn btn-warning" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav ms-auto">
+                {% if user.is_authenticated %}
+                    <!-- Username display -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">{{ user.username }}</a>
+                    </li>
+
+                    {% if user|is_fieldstaff %}
+                        <!-- Show Dashboard for FieldStaff -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'fieldstaff_dashboard' %}">
+                                <i class="fas fa-tachometer-alt"></i> Dashboard
+                            </a>
+                        </li>
+                    {% elif user|is_showroomstaff %}
+                        <!-- Show Dashboard for ShowroomStaff -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'showroomstaff_dashboard' %}">
+                                <i class="fas fa-tachometer-alt"></i> Dashboard
+                            </a>
+                        </li>
+                    {% elif user|is_painter %}
+                        <!-- Show Dashboard for Painter -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'painter:painter_dashboard' %}">
+                                <i class="fas fa-tachometer-alt"></i> Dashboard
+                            </a>
+                        </li>
+                    {% elif user|is_customer %}
+                        <!-- Home link for customers -->
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="{% url 'index' %}">Home</a>
+                        </li>
+                        <!-- Profile dropdown for Customers -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Profile
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                <li><a class="dropdown-item" href="{% url 'customer_profile_update' %}">Profile </a></li>
+                                <li><a class="dropdown-item" href="{% url 'my_orders' %}">My Orders</a></li>
+                               <!-- <li>
+                                    <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: none;">
+                                        {% csrf_token %}
+                                    </form>
+                                  
+                                    <a href="#" class="dropdown-item" onclick="document.getElementById('logout-form').submit();">
+                                        <i class="fas fa-sign-out-alt"></i> Logout
+                                    </a>
+                                </li>-->
+                            </ul>
+                        </li>
+                    {% endif %}
+
+                    {% if user.is_superuser %}
+                        <!-- Show Admin Dashboard Link -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'admin:index' %}">
+                                <i class="fas fa-user-shield"></i> Admin Dashboard
+                            </a>
+                        </li>
+                    {% endif %}
+                    
+                    <!-- Logout link for all authenticated users -->
+                    <li class="nav-item">
+                        <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: none;">
+                            {% csrf_token %}
+                        </form>
+                        <a href="#" class="nav-link" onclick="document.getElementById('logout-form').submit();">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </li>
+                {% else %}
+                    <!-- Show Home and Login for Non-Logged-In Users -->
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{% url 'index' %}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login_view' %}">Login</a>
+                    </li>
+                {% endif %}
+            
+                <!-- Cart is always visible for customers only -->
+                {% if user.is_authenticated and user|is_customer %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'cart' %}">
+                        <i class="fas fa-shopping-cart"></i> Cart
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

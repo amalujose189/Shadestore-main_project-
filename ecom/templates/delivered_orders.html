@@ -1,0 +1,142 @@
+{% extends 'fieldstaff_dash.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/sitevisit.css' %}">
+<style>
+    .site-visit-container {
+        padding: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .site-visit-card {
+        background-color: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .form-section {
+        background-color: #f8fafc;
+        border-radius: 0.375rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid #3b82f6;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+        margin-top: 1rem;
+    }
+
+    .table-auto {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 5px;
+    }
+
+    .table-auto thead tr {
+        background-color: #f1f5f9;
+    }
+
+    .table-auto th {
+        font-weight: 600;
+        text-align: left;
+        padding: 10px;
+    }
+
+    .table-auto td {
+        padding: 10px;
+        border: 1px solid #d1d5db;
+    }
+
+    .table-auto tbody tr:hover {
+        background-color: #f8fafc;
+    }
+
+    .btn-primary {
+        display: inline-block;
+        background-color: #3b82f6;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 0.25rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: background-color 0.2s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #2563eb;
+    }
+
+    .alert {
+        border-left: 4px solid #3b82f6;
+    }
+
+    h1, h5 {
+        color: #1e3a8a;
+    }
+
+    @media (max-width: 768px) {
+        .site-visit-container {
+            padding: 1rem;
+        }
+        .site-visit-card {
+            padding: 1.5rem;
+        }
+        .form-section {
+            padding: 1rem;
+        }
+    }
+</style>
+<div class="site-visit-container">
+    <div class="site-visit-card">
+        <h1 class="text-2xl font-bold mb-6">Delivered Orders</h1>
+        <div class="form-section">
+            <h5 class="text-lg font-semibold mb-3">Delivery Statistics</h5>
+            <p><strong>Field Staff:</strong> {{ field_staff }}</p>
+            <p><strong>Total Orders Delivered:</strong> {{ total_orders }}</p>
+            <p><strong>Total Amount:</strong> ${{ total_amount }}</p>
+        </div>
+
+        {% if delivered_orders %}
+        <div class="table-responsive">
+            <table class="table-auto border border-gray-300 shadow-lg rounded-lg overflow-hidden">
+                <thead>
+                    <tr class="bg-blue-500 text-white">
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Delivered Date</th>
+                        <th>Amount</th>
+                        <th>Payment Method</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in delivered_orders %}
+                    <tr class="bg-white hover:bg-gray-100 transition-all duration-200">
+                        <td>{{ order.id }}</td>
+                        <td>{{ order.user.first_name }} {{ order.user.last_name }}</td>
+                        <td>{{ order.delivery_date }}</td>
+                        <td class="font-bold text-green-600">${{ order.total_amount }}</td>
+                        <td>{{ order.get_payment_method_display }}</td>
+                        <td>
+                            <a href="{% url 'assigned_order_detail' order.id %}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm transition-all duration-200">
+                                View Details
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert bg-blue-100 text-blue-700 p-4 rounded-lg mt-4">
+            You have not delivered any orders yet.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

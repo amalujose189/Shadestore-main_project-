@@ -1,0 +1,26 @@
+{# templates/admin/widgets/color_shade_widget.html #}
+<div class="color-shade-container">
+    <input type="hidden"
+           name="{{ widget.name }}"
+           {% if widget.attrs.id %} id="{{ widget.attrs.id }}" {% endif %}
+           value="{{ widget.value|default:'{}'|safe }}"
+           class="color-shade-widget {% if widget.attrs.class %}{{ widget.attrs.class }}{% endif %}"
+    >
+
+    <div class="colors-list">
+        {% for color, quantity in colors.items %}
+        <div class="color-item" data-color="{{ color }}">
+            <div class="color-swatch" style="background-color: {{ color }}"></div>
+            <span class="color-code">{{ color }}</span>
+            <input type="number" class="quantity-input" value="{{ quantity }}" min="0">
+            <button type="button" class="remove-color">✕</button>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="color-controls">
+        <input type="color" class="new-color-picker" value="#000000">
+        <input type="number" class="new-color-quantity" value="1" min="1" placeholder="Quantity">
+        <button type="button" class="add-color-btn">Add Color</button>
+    </div>
+</div>

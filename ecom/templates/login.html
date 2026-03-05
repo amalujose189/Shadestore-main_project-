@@ -1,0 +1,59 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/login.css'%}">
+
+<div class="container" id="formContainer">
+    <div class="form-container">
+        <!-- Add messages display -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        <div class="form-box login-form">
+            <h1>Login</h1>
+            <form method="POST" action="{% url 'login_view' %}">
+                {% csrf_token %}
+                <input type="text" name="username_or_email" placeholder="Email or Phone" required>
+                <input type="password" name="password" placeholder="Password" required>
+                <input type="submit" value="Login">
+                <a href="#">Forgot Password?</a>
+                <p class="switch" onclick="toggleForm()">Don't have an account? Signup</p>
+            </form>
+        </div>
+        
+        <div class="form-box signup-form">
+            <h1>Signup</h1>
+            <form method="POST" action="{% url 'signup' %}">
+                {% csrf_token %}
+                <input type="text" name="first_name" placeholder="First Name" required>
+                <input type="text" name="last_name" placeholder="Last Name" required>
+                <input type="text" name="username" placeholder="Username" required>
+                <input type="email" name="email" placeholder="Email" required>
+                <input type="tel" name="phone" placeholder="Phone Number" required>
+                <input type="password" name="password" placeholder="Password" required>
+                <input type="password" name="confirm_password" placeholder="Confirm Password" required>
+                <input type="submit" value="Signup">
+                <p class="switch" onclick="toggleForm()">Already have an account? Login</p>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleForm() {
+        document.getElementById('formContainer').classList.toggle('flip');
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        // Remove order success messages when on login page
+        sessionStorage.removeItem('orderSuccess');
+        sessionStorage.removeItem('orderId');
+    });
+</script>
+{% endblock content %}

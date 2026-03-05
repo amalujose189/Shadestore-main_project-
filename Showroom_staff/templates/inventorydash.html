@@ -1,0 +1,664 @@
+{% extends 'showroomstaff_dash.html' %}
+{% load static %}
+
+{% block title %}30-Day Sales Report{% endblock %}
+
+{% block content %}
+<div class="sales-dashboard">
+    <h1 class="page-title">Last 30 Days Sales Report</h1>
+    
+    <!-- Sales Summary Section -->
+    <div class="data-container" id="sales-summary">
+        <h2><i class="fas fa-chart-line"></i> Sales Summary</h2>
+        <div class="summary-cards">
+            <div class="summary-card">
+                <div class="card-icon"><i class="fas fa-shopping-cart"></i></div>
+                <div class="card-content">
+                    <div class="card-value">{{ total_orders }}</div>
+                    <div class="card-label">Total Orders</div>
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <div class="card-icon"><i class="fas fa-dollar-sign"></i></div>
+                <div class="card-content">
+                    <div class="card-value">₹{{ total_revenue }}</div>
+                    <div class="card-label">Total Revenue</div>
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <div class="card-icon"><i class="fas fa-boxes"></i></div>
+                <div class="card-content">
+                    <div class="card-value">{{ total_units_sold }}</div>
+                    <div class="card-label">Units Sold</div>
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <div class="card-icon"><i class="fas fa-user"></i></div>
+                <div class="card-content">
+                    <div class="card-value">{{ unique_customers }}</div>
+                    <div class="card-label">Unique Customers</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sales Trend Chart -->
+    <div class="chart-container">
+        <h2><i class="fas fa-chart-line"></i> Overall Sales (Last 30 Days)</h2>
+        <div class="chart-wrapper">
+            <canvas id="salesTrendChart"></canvas>
+        </div>
+    </div>
+    
+    <!-- Best Selling Products Chart -->
+    <div class="chart-container">
+        <h2><i class="fas fa-chart-bar"></i> Best Selling Products</h2>
+        <div class="chart-wrapper">
+            <canvas id="bestSellingChart"></canvas>
+        </div>
+    </div>
+    
+    <!-- Product Category Distribution Chart -->
+    <div class="chart-container">
+        <h2><i class="fas fa-chart-pie"></i> Sales by Category</h2>
+        <div class="chart-wrapper">
+            <canvas id="categoryChart"></canvas>
+        </div>
+    </div>
+    
+    <!-- Download Report Section -->
+    <div class="download-container">
+        <h2><i class="fas fa-file-download"></i> Download Report</h2>
+        <div class="download-buttons">
+            <button id="download-pdf" class="download-btn pdf-btn">
+                <i class="fas fa-file-pdf"></i> Download PDF
+            </button>
+            <button id="download-excel" class="download-btn excel-btn">
+                <i class="fas fa-file-excel"></i> Download Excel
+            </button>
+        </div>
+    </div>
+    
+    <!-- Detailed Sales Table -->
+   <!-- <div class="table-container">
+        <h2><i class="fas fa-list"></i> Recent Orders</h2>
+        <div class="table-responsive">
+            <table class="sales-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Date</th>
+                        <th>Customer</th>
+                        <th>Products</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in recent_orders %}
+                    <tr>
+                        <td>{{ order.invoice_no }}</td>
+                        <td>{{ order.date }}</td>
+                        <td>{{ order.user.username }}</td>
+                        <td>
+                            {% for item in order.items.all %}
+                                {{ item.quantity }} x {{ item.product.product_name }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </td>
+                        <td>₹{{ order.total_amount }}</td>
+                        <td>
+                            <span class="status-badge {{ order.status }}">{{ order.status }}</span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="no-data">No orders found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>-->
+
+<!-- Chart.js and jsPDF/SheetJS for report generation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize sales trend chart
+    const salesTrendCtx = document.getElementById('salesTrendChart').getContext('2d');
+    const salesTrendChart = new Chart(salesTrendCtx, {
+        type: 'line',
+        data: {
+            labels: [
+                {% for date in sales_dates %}
+                    "{{ date|date:'M d' }}",
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Revenue (Last 30 Days)',
+                data: [
+                    {% for amount in sales_amounts %}
+                        {{ amount }},
+                    {% endfor %}
+                ],
+                borderColor: '#4e73df',
+                backgroundColor: 'rgba(78, 115, 223, 0.05)',
+                tension: 0.3,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Daily Sales Revenue (Last 30 Days)'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return 'Revenue: ₹' + context.raw;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Revenue (₹)'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Date'
+                    }
+                }
+            }
+        }
+    });
+    
+    // Initialize best selling products chart
+    const bestSellingCtx = document.getElementById('bestSellingChart').getContext('2d');
+    const bestSellingChart = new Chart(bestSellingCtx, {
+        type: 'bar',
+        data: {
+            labels: [
+                {% for product in best_selling_products %}
+                    "{{ product.product_name }}",
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Units Sold',
+                data: [
+                    {% for product in best_selling_products %}
+                        {{ product.sold_count }},
+                    {% endfor %}
+                ],
+                backgroundColor: [
+                    'rgba(54, 162, 235, 0.7)',
+                    'rgba(75, 192, 192, 0.7)',
+                    'rgba(153, 102, 255, 0.7)',
+                    'rgba(255, 159, 64, 0.7)',
+                    'rgba(255, 99, 132, 0.7)'
+                ],
+                borderColor: [
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(255, 99, 132, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: 'Top Selling Products (Last 30 Days)'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return 'Units Sold: ' + context.raw;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Units Sold'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Products'
+                    },
+                    ticks: {
+                        autoSkip: false,
+                        maxRotation: 45,
+                        minRotation: 45
+                    }
+                }
+            }
+        }
+    });
+    
+    // Initialize category distribution chart
+    const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+    const categoryChart = new Chart(categoryCtx, {
+        type: 'pie',
+        data: {
+            labels: [
+                {% for category in category_sales %}
+                    "{{ category.name }}",
+                {% endfor %}
+            ],
+            datasets: [{
+                data: [
+                    {% for category in category_sales %}
+                        {{ category.amount }},
+                    {% endfor %}
+                ],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.7)',
+                    'rgba(54, 162, 235, 0.7)',
+                    'rgba(255, 206, 86, 0.7)',
+                    'rgba(75, 192, 192, 0.7)',
+                    'rgba(153, 102, 255, 0.7)',
+                    'rgba(255, 159, 64, 0.7)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Sales by Category (Last 30 Days)'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.raw || 0;
+                            const total = context.dataset.data.reduce((acc, val) => acc + val, 0);
+                            const percentage = ((value / total) * 100).toFixed(1);
+                            return `${label}: ₹${value} (${percentage}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Download PDF report for last 30 days
+    document.getElementById('download-pdf').addEventListener('click', function() {
+        window.location.href = "{% url 'download_report' %}?format=pdf&date-range=30";
+    });
+    
+    // Download Excel report for last 30 days
+    document.getElementById('download-excel').addEventListener('click', function() {
+        window.location.href = "{% url 'download_report' %}?format=excel&date-range=30";
+    });
+});
+</script>
+
+<style>
+    /* Your existing styles remain the same */
+    * Page Styles */
+    .sales-dashboard {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .page-title {
+        color: #333;
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    /* Filter Container */
+    .filter-container {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+        padding: 15px;
+    }
+    
+    .filter-container h2 {
+        color: #333;
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+    }
+    
+    .filter-form {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        align-items: flex-end;
+    }
+    
+    .form-group {
+        flex: 1;
+        min-width: 200px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #555;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    
+    .date-inputs {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .filter-btn {
+        background-color: #4e73df;
+        border: none;
+        border-radius: 4px;
+        color: white;
+        cursor: pointer;
+        padding: 8px 15px;
+    }
+    
+    .filter-btn:hover {
+        background-color: #3756a4;
+    }
+    
+    /* Summary Cards */
+    .data-container {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+        padding: 15px;
+    }
+    
+    .data-container h2 {
+        color: #333;
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+    }
+    
+    .summary-cards {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    
+    .summary-card {
+        background-color: #f8f9fc;
+        border-left: 4px solid #4e73df;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        flex: 1;
+        min-width: 220px;
+        padding: 15px;
+    }
+    
+    .summary-card:nth-child(2) {
+        border-left-color: #1cc88a;
+    }
+    
+    .summary-card:nth-child(3) {
+        border-left-color: #36b9cc;
+    }
+    
+    .summary-card:nth-child(4) {
+        border-left-color: #f6c23e;
+    }
+    
+    .card-icon {
+        background-color: #ebf0ff;
+        border-radius: 50%;
+        color: #4e73df;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        height: 50px;
+        margin-right: 15px;
+        width: 50px;
+    }
+    
+    .summary-card:nth-child(2) .card-icon {
+        background-color: #e0f8ef;
+        color: #1cc88a;
+    }
+    
+    .summary-card:nth-child(3) .card-icon {
+        background-color: #e8f6f8;
+        color: #36b9cc;
+    }
+    
+    .summary-card:nth-child(4) .card-icon {
+        background-color: #fff9e6;
+        color: #f6c23e;
+    }
+    
+    .card-content {
+        flex: 1;
+    }
+    
+    .card-value {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #333;
+    }
+    
+    .card-label {
+        color: #666;
+        font-size: 0.9rem;
+    }
+    
+    /* Chart Container */
+    .chart-container {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+        padding: 15px;
+    }
+    
+    .chart-container h2 {
+        color: #333;
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+    }
+    
+    .chart-wrapper {
+        height: 400px;
+        position: relative;
+    }
+    
+    /* Download Section */
+    .download-container {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+        padding: 15px;
+    }
+    
+    .download-container h2 {
+        color: #333;
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+    }
+    
+    .download-buttons {
+        display: flex;
+        gap: 15px;
+    }
+    
+    .download-btn {
+        border: none;
+        border-radius: 4px;
+        color: white;
+        cursor: pointer;
+        font-weight: bold;
+        padding: 10px 20px;
+    }
+    
+    .pdf-btn {
+        background-color: #e74a3b;
+    }
+    
+    .pdf-btn:hover {
+        background-color: #c13124;
+    }
+    
+    .excel-btn {
+        background-color: #1cc88a;
+    }
+    
+    .excel-btn:hover {
+        background-color: #169b6b;
+    }
+    
+    /* Table Container */
+    .table-container {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+        padding: 15px;
+    }
+    
+    .table-container h2 {
+        color: #333;
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+    }
+    
+    .table-responsive {
+        overflow-x: auto;
+    }
+    
+    .sales-table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    
+    .sales-table th,
+    .sales-table td {
+        border: 1px solid #e3e6f0;
+        padding: 10px;
+    }
+    
+    .sales-table th {
+        background-color: #f8f9fc;
+        color: #4e73df;
+        font-weight: bold;
+        text-align: left;
+    }
+    
+    .sales-table tr:nth-child(even) {
+        background-color: #f8f9fc;
+    }
+    
+    .status-badge {
+        background-color: #e2e3e5;
+        border-radius: 12px;
+        color: #555;
+        display: inline-block;
+        font-size: 0.8rem;
+        padding: 3px 10px;
+    }
+    
+    .status-badge.pending {
+        background-color: #f6c23e;
+        color: #523b08;
+    }
+    
+    .status-badge.shipped {
+        background-color: #4e73df;
+        color: #fff;
+    }
+    
+    .status-badge.delivered {
+        background-color: #1cc88a;
+        color: #fff;
+    }
+    
+    .status-badge.cancelled {
+        background-color: #e74a3b;
+        color: #fff;
+    }
+    
+    .no-data {
+        color: #666;
+        font-style: italic;
+        text-align: center;
+    }
+    
+    /* Responsive styles */
+    @media (max-width: 768px) {
+        .sales-dashboard {
+            padding: 15px;
+        }
+        
+        .form-group {
+            width: 100%;
+        }
+        
+        .date-inputs {
+            flex-direction: column;
+        }
+        
+        .download-buttons {
+            flex-direction: column;
+        }
+        
+        .download-btn {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}

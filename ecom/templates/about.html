@@ -1,0 +1,509 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block content %}
+<!-- About Page Header -->
+<div class="about-header">
+  <div class="container">
+    <h1 class="display-4">About ShadeStore</h1>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">About Us</li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<!-- About Content -->
+<div class="container about-container">
+  <div class="row">
+    <div class="col-lg-6">
+      <div class="about-content">
+        <h2>Welcome to ShadeStore</h2>
+        <p class="lead">Your One-Stop Destination for Premium Paints and Home Decor Solutions</p>
+        <p>ShadeStore, established in 2010, is the online platform of Nellithanam Paints - a trusted name in the paint industry for over two decades. We provide high-quality paints, tools, and home decor solutions to customers across Kerala.</p>
+        <p>At ShadeStore, we believe that the right color can transform any space. Our mission is to help you find the perfect shade that resonates with your style and personality.</p>
+        
+        <h3>Our Vision</h3>
+        <p>To be the leading online destination for all painting and home decoration needs, providing customers with premium products, exceptional service, and innovative solutions.</p>
+        
+        <h3>Our Values</h3>
+        <ul class="values-list">
+          <li><span>Quality Excellence</span> - We never compromise on the quality of our products.</li>
+          <li><span>Customer First</span> - Your satisfaction is our top priority.</li>
+          <li><span>Innovation</span> - We continuously evolve to meet changing customer needs.</li>
+          <li><span>Sustainability</span> - We are committed to eco-friendly practices and products.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="about-image-container">
+        <img src="{% static 'images/about1.png' %}" alt="ShadeStore Store Front" class="main-image">
+        <!--<div class="image-grid">
+          <img src="/api/placeholder/280/180" alt="Paint Collection" class="grid-image">
+          <img src="/api/placeholder/280/180" alt="Color Consultation" class="grid-image">
+          <img src="/api/placeholder/280/180" alt="Quality Tools" class="grid-image">
+          <img src="/api/placeholder/280/180" alt="Customer Service" class="grid-image">
+        </div>-->
+      </div>
+    </div>
+  </div>
+  
+  <hr class="section-divider">
+  
+  <!-- Team Section -->
+  <div class="team-section">
+    <h2 class="text-center mb-5">Meet Our Team</h2>
+    <div class="row">
+      <div class="col-md-4">
+        <div class="team-member">
+          <!--<img src="/api/placeholder/300/300" alt="Team Member" class="team-img">-->
+          <h4>John Nellithanam</h4>
+          <p class="designation">Founder & CEO</p>
+          <p class="member-bio">With over 25 years of experience in the paint industry, John has built ShadeStore from the ground up, focusing on quality and customer satisfaction.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="team-member">
+           <!-- <img src="{% static 'images/about1.png' %}" alt="Team Member" class="team-img">-->
+          <h4>Priya Thomas</h4>
+          <p class="designation">Color Consultant</p>
+          <p class="member-bio">Priya brings 15 years of interior design expertise to help customers find the perfect color combinations for their spaces.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="team-member">
+          <!--  <img src="/api/placeholder/300/300" alt="Team Member" class="team-img">-->
+          <h4>Rahul Menon</h4>
+          <p class="designation">Customer Experience Manager</p>
+          <p class="member-bio">Rahul ensures every customer receives personalized attention and the best shopping experience possible.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <hr class="section-divider">
+  
+  <!-- Why Choose Us Section -->
+  <div class="why-choose-section">
+    <h2 class="text-center mb-5">Why Choose ShadeStore?</h2>
+    <div class="row">
+      <div class="col-md-3">
+        <div class="feature-box">
+          <i class="feature-icon quality-icon"></i>
+          <h4>Premium Quality</h4>
+          <p>We source only the best paints and tools from trusted manufacturers worldwide.</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="feature-box">
+          <i class="feature-icon expert-icon"></i>
+          <h4>Expert Advice</h4>
+          <p>Our team of color consultants provides personalized recommendations for your project.</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="feature-box">
+          <i class="feature-icon delivery-icon"></i>
+          <h4>Fast Delivery</h4>
+          <p>Enjoy quick delivery to your doorstep, with same-day options available in select areas.</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="feature-box">
+          <i class="feature-icon warranty-icon"></i>
+          <h4>Satisfaction Guarantee</h4>
+          <p>We stand behind our products with a 100% satisfaction guarantee.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <hr class="section-divider">
+  
+  <!-- Our Store Section -->
+  <div class="store-section">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="store-info">
+          <h2>Visit Our Store</h2>
+          <p>Experience our products in person at our flagship store in Etumanoor, Kottayam. Our knowledgeable staff is always ready to assist you.</p>
+          <div class="store-details">
+            <p><strong>Address:</strong> Nellithanam Paints, Main Road, Etumanoor, Kottayam, Kerala</p>
+            <p><strong>Phone:</strong> 9025925787, 9034678024</p>
+            <p><strong>Hours:</strong> Monday-Saturday: 9:00 AM - 7:00 PM | Sunday: 10:00 AM - 4:00 PM</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="map-container">
+          <!-- Placeholder for map -->
+          <div class="map-placeholder">
+           <!-- <img src="/api/placeholder/550/300" alt="Store Location Map">-->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <hr class="section-divider">
+  
+  <!-- CTA Section -->
+  <div class="cta-section text-center">
+    <h2>Ready to Transform Your Space?</h2>
+    <p class="lead">Explore our extensive collection of premium paints and home decor products.</p>
+    <div class="cta-buttons">
+      <a href="{% url 'index' %}" class="btn btn-primary btn-lg">Shop Now</a>
+   
+    </div>
+  </div>
+</div>
+
+<style>
+/* About Page Styles */
+.about-header {
+  background: linear-gradient(135deg, #3498db, #2c3e50);
+  color: white;
+  padding: 60px 0 30px;
+  margin-bottom: 40px;
+}
+
+.about-header h1 {
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+.breadcrumb {
+  background: transparent;
+  padding: 0;
+}
+
+.breadcrumb-item a {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.breadcrumb-item.active {
+  color: white;
+}
+
+.about-container {
+  padding: 20px 0 60px;
+}
+
+.about-content {
+  padding: 0 15px;
+}
+
+.about-content h2 {
+  color: #2c3e50;
+  margin-bottom: 15px;
+  font-weight: 700;
+}
+
+.about-content .lead {
+  color: #3498db;
+  font-size: 1.25rem;
+  margin-bottom: 25px;
+}
+
+.about-content h3 {
+  color: #2c3e50;
+  margin-top: 30px;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.values-list {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 20px;
+}
+
+.values-list li {
+  margin-bottom: 15px;
+  position: relative;
+  padding-left: 30px;
+}
+
+.values-list li:before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: #3498db;
+  font-weight: bold;
+}
+
+.values-list span {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.about-image-container {
+  padding: 15px;
+}
+
+.main-image {
+  width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.grid-image {
+  width: 100%;
+  border-radius: 6px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Team Section */
+.team-section {
+  padding: 40px 0;
+}
+
+.team-member {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.team-img {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 20px;
+  border: 5px solid #f8f9fa;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.team-member h4 {
+  color: #2c3e50;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.designation {
+  color: #3498db;
+  font-weight: 500;
+  margin-bottom: 15px;
+}
+
+.member-bio {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+/* Why Choose Us Section */
+.why-choose-section {
+  padding: 40px 0;
+}
+
+.feature-box {
+  text-align: center;
+  padding: 20px;
+  border-radius: 10px;
+  background-color: #f8f9fa;
+  height: 100%;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.feature-box:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.feature-icon {
+  display: inline-block;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background-color: #e0f7fa;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.feature-icon:before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 30px;
+  color: #3498db;
+}
+
+.quality-icon:before {
+  content: "★";
+}
+
+.expert-icon:before {
+  content: "✓";
+}
+
+.delivery-icon:before {
+  content: "↪";
+}
+
+.warranty-icon:before {
+  content: "✓";
+}
+
+.feature-box h4 {
+  color: #2c3e50;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+/* Store Section */
+.store-section {
+  padding: 40px 0;
+}
+
+.store-info h2 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+  font-weight: 700;
+}
+
+.store-details {
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 25px;
+}
+
+.map-container {
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.map-placeholder {
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.map-placeholder img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* CTA Section */
+.cta-section {
+  padding: 50px 0 30px;
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  margin-top: 40px;
+}
+
+.cta-section h2 {
+  color: #2c3e50;
+  margin-bottom: 15px;
+  font-weight: 700;
+}
+
+.cta-buttons {
+  margin-top: 30px;
+}
+
+.cta-buttons .btn {
+  margin: 0 10px;
+  padding: 10px 30px;
+  border-radius: 30px;
+  font-weight: 600;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #3498db, #2c3e50);
+  border: none;
+}
+
+.btn-outline-primary {
+  color: #3498db;
+  border: 2px solid #3498db;
+}
+
+.btn-outline-primary:hover {
+  background-color: #3498db;
+  color: white;
+}
+
+/* Section Divider */
+.section-divider {
+  height: 3px;
+  background: linear-gradient(to right, transparent, rgba(52, 152, 219, 0.5), transparent);
+  border: none;
+  margin: 40px 0;
+}
+
+/* Media Queries */
+@media (max-width: 992px) {
+  .about-header {
+    padding: 40px 0 20px;
+  }
+  
+  .team-img {
+    width: 150px;
+    height: 150px;
+  }
+}
+
+@media (max-width: 768px) {
+  .about-content,
+  .about-image-container {
+    margin-bottom: 30px;
+  }
+  
+  .image-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .cta-buttons .btn {
+    margin: 10px;
+  }
+}
+
+@media (max-width: 576px) {
+  .about-header {
+    padding: 30px 0 15px;
+  }
+  
+  .about-header h1 {
+    font-size: 2rem;
+  }
+  
+  .team-img {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .image-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+
+<!-- Include the profile page connection for Your Account link -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Get all "Your Account" links
+    const accountLinks = document.querySelectorAll('a:contains("Your Account")');
+    
+    // Update href attributes
+    accountLinks.forEach(link => {
+      link.setAttribute('href', '{% url "profile" %}');
+    });
+  });
+</script>
+
+{% include 'inc/footer.html' %}
+{% endblock %}

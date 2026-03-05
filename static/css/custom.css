@@ -1,0 +1,121 @@
+/* custom.css */
+
+/* Bold text for headers and titles */
+h1, h2, h3, h4, h5, h6, .card-title, .nav-sidebar .nav-header {
+    font-weight: 700 !important;
+    color: #2C3E50;
+}
+
+/* Enhance the main content area */
+.content-wrapper {
+    background-color: #f8f9fa;
+}
+
+/* Improve card styling */
+.card {
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+    border: none;
+}
+
+.card-header {
+    background-color: #ffffff;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 15px 20px;
+}
+
+/* Enhance table styling */
+.table {
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.table thead th {
+    background-color: #f8f9fa;
+    font-weight: 700;
+    border-bottom: 2px solid #dee2e6;
+}
+
+/* Improve form field styling */
+.form-control {
+    border-radius: 4px;
+    border: 1px solid #ced4da;
+}
+
+.form-control:focus {
+    border-color: #6c757d;
+    box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.25);
+}
+
+/* Enhance button styling */
+.btn {
+    border-radius: 4px;
+    font-weight: 600;
+    padding: 8px 16px;
+}
+
+/* Improve logo display */
+.brand-image {
+    max-height: 40px;
+    margin-top: -5px;
+}
+
+/* Make navigation links more prominent */
+.nav-sidebar .nav-link {
+    font-weight: 600;
+    padding: 10px 15px;
+}
+
+/* Hover effects for navigation */
+.nav-sidebar .nav-link:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+}
+
+/* Active menu item styling */
+.nav-sidebar .nav-link.active {
+    background-color: rgba(0, 123, 255, 0.2);
+    color: #0056b3;
+}
+
+/* Footer styling */
+.main-footer {
+    background-color: #ffffff;
+    border-top: 1px solid #dee2e6;
+    padding: 15px;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+/* Improve pagination styling */
+.pagination {
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.page-item.active .page-link {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+/* Toast notifications */
+.toasts-top-right {
+    top: 15px;
+    right: 15px;
+}
+
+/* Improve modal styling */
+.modal-content {
+    border-radius: 8px;
+    border: none;
+}
+
+.modal-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    background-color: #f8f9fa;
+}
+
+/* Enhance action buttons */
+.actions-btn {
+    margin-right: 5px;
+}

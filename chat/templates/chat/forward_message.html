@@ -1,0 +1,98 @@
+{% extends 'chat/chat_base.html' %}
+{% block title %}Forward Message{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Forward Message</h4>
+                </div>
+                <div class="card-body">
+                    <div class="original-message p-3 bg-light rounded mb-4">
+                        <h5>Message to forward:</h5>
+                        
+                        <div class="message-content">
+                            {% if message.content %}
+                                <p>{{ message.content }}</p>
+                            {% endif %}
+                            
+                            {% if message.attachment_type == 'file' %}
+                                <div class="attachment-file mt-2">
+                                    <a href="{{ message.attachment_file.url }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-file"></i> {{ message.attachment_file.name|slice:"20:" }}
+                                    </a>
+                                </div>
+                            {% endif %}
+                            
+                            {% if message.attachment_type == 'image' %}
+                                <div class="attachment-image mt-2">
+                                    <img src="{{ message.attachment_image.url }}" class="img-fluid rounded" style="max-height: 150px;">
+                                </div>
+                            {% endif %}
+                            
+                            {% if message.attachment_type == 'location' %}
+                                <div class="attachment-location mt-2">
+                                    <div class="map-preview" style="height: 150px; background-color: #f8f9fa;">
+                                        <iframe 
+                                            width="100%" 
+                                            height="150" 
+                                            frameborder="0" 
+                                            src="https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q={{ message.location_lat }},{{ message.location_lng }}" 
+                                            allowfullscreen>
+                                        </iframe>
+                                    </div>
+                                    <div class="location-name small mt-1">
+                                        <i class="fas fa-map-marker-alt"></i> {{ message.location_name|default:"Shared location" }}
+                                    </div>
+                                </div>
+                            {% endif %}
+                            
+                            <div class="message-meta mt-2 text-muted small">
+                                <div>From: {{ message.sender.username }}</div>
+                                <div>{{ message.timestamp|date:"M d, Y g:i a" }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h5>Select where to forward:</h5>
+                    <div class="list-group">
+                        {% for room in available_rooms %}
+                            <form method="post" action="{% url 'chat:forward_message' message.id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="target_room_id" value="{{ room.id }}">
+                                <button type="submit" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                    <div>
+                                        {% if room.is_group %}
+                                            <i class="fas fa-users mr-2"></i> {{ room.name }}
+                                        {% else %}
+                                            <i class="fas fa-user mr-2"></i>
+                                            {% for participant in room.participants.all %}
+                                                {% if participant != request.user %}
+                                                    {{ participant.get_full_name|default:participant.username }}
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                    <span class="badge badge-primary badge-pill">
+                                        <i class="fas fa-share"></i> Forward
+                                    </span>
+                                </button>
+                            </form>
+                        {% empty %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i> You have no other chat rooms to forward this message to.
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'chat:chat_room' message.chat_room.id %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Chat
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

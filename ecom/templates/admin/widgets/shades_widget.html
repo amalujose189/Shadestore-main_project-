@@ -1,0 +1,150 @@
+<!-- templates/admin/widgets/shades_widget.html -->
+<div class="shades-widget-container">
+    <!-- Hidden textarea for the form submission -->
+    <textarea name="{{ widget.name }}" id="{{ widget.attrs.id }}" 
+              class="shades-json-data" style="display: none;">{{ widget.value }}</textarea>
+    
+    <!-- Visual editor for shades -->
+    <div class="shades-editor">
+        <div id="shades-list"></div>
+        <button type="button" class="add-shade-btn" id="add-shade-button">Add Shade</button>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const jsonField = document.querySelector('.shades-json-data');
+        const shadesList = document.getElementById('shades-list');
+        const addButton = document.getElementById('add-shade-button');
+        
+        // Initialize shades from JSON data
+        let shadesData = {};
+        try {
+            shadesData = JSON.parse(jsonField.value || '{}');
+        } catch (e) {
+            console.error('Error parsing shades JSON:', e);
+            shadesData = {};
+        }
+        
+        // Function to render all shades
+        function renderShades() {
+            shadesList.innerHTML = '';
+            
+            Object.entries(shadesData).forEach(([color, quantity]) => {
+                addShadeToUI(color, quantity);
+            });
+        }
+        
+        // Function to add a shade to the UI
+        function addShadeToUI(color = '#ffffff', quantity = 0) {
+            const shadeRow = document.createElement('div');
+            shadeRow.className = 'shade-row';
+            
+            // Color picker
+            const colorPicker = document.createElement('input');
+            colorPicker.type = 'color';
+            colorPicker.className = 'shade-color';
+            colorPicker.value = color;
+            
+            // Quantity input
+            const quantityInput = document.createElement('input');
+            quantityInput.type = 'number';
+            quantityInput.className = 'shade-quantity';
+            quantityInput.min = '0';
+            quantityInput.value = quantity;
+            
+            // Delete button
+            const deleteBtn = document.createElement('button');
+            deleteBtn.type = 'button';
+            deleteBtn.className = 'shade-delete';
+            deleteBtn.textContent = 'Remove';
+            
+            // Add event listeners
+            colorPicker.addEventListener('change', function() {
+                updateShadesData();
+            });
+            
+            quantityInput.addEventListener('change', function() {
+                updateShadesData();
+            });
+            
+            deleteBtn.addEventListener('click', function() {
+                shadeRow.remove();
+                updateShadesData();
+            });
+            
+            // Append elements to row
+            shadeRow.appendChild(colorPicker);
+            shadeRow.appendChild(quantityInput);
+            shadeRow.appendChild(deleteBtn);
+            
+            // Add to shade list
+            shadesList.appendChild(shadeRow);
+        }
+        
+        // Function to update the JSON data from UI
+        function updateShadesData() {
+            const newShadesData = {};
+            
+            const rows = shadesList.querySelectorAll('.shade-row');
+            rows.forEach(row => {
+                const color = row.querySelector('.shade-color').value;
+                const quantity = parseInt(row.querySelector('.shade-quantity').value) || 0;
+                newShadesData[color] = quantity;
+            });
+            
+            shadesData = newShadesData;
+            jsonField.value = JSON.stringify(shadesData);
+        }
+        
+        // Add button event listener
+        addButton.addEventListener('click', function() {
+            addShadeToUI();
+            updateShadesData();
+        });
+        
+        // Initial render
+        renderShades();
+    });
+</script>
+
+<style>
+    .shades-editor {
+        margin-top: 10px;
+    }
+    
+    .shade-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    
+    .shade-color {
+        width: 50px;
+        height: 30px;
+        margin-right: 10px;
+    }
+    
+    .shade-quantity {
+        width: 100px;
+        margin-right: 10px;
+        padding: 5px;
+    }
+    
+    .shade-delete {
+        padding: 5px 10px;
+        background-color: #f44336;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+    
+    .add-shade-btn {
+        padding: 8px 12px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+</style>

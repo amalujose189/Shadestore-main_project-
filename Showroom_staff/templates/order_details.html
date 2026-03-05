@@ -1,0 +1,432 @@
+{% extends 'showroomstaff_dash.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/updateform.css' %}">
+<div class="container mt-4">
+    <h2 class="section-header text-center mb-4">Order Details</h2>
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="order-card card">
+        <div class="card-body">
+            <!-- Customer check section -->
+            <div class="customer-check mb-4">
+                <h4 class="section-header">Customer Registration Status</h4>
+                <div class="form-group">
+                    <label>Is Customer Already Registered?</label>
+                    <div class="btn-group d-block" role="group">
+                        <button type="button" class="btn btn-outline-primary" id="customer-yes">Yes</button>
+                        <button type="button" class="btn btn-outline-primary active" id="customer-no">No</button>
+                    </div>
+                </div>
+                
+                <div id="existing-customer-section" class="mt-3" style="display: none;">
+                    <div class="form-group">
+                        <label>Select Customer</label>
+                        <select id="customer-dropdown" class="form-control">
+                            <option value="">Select a customer</option>
+                            {% for customer in customer_list %}
+                            <option value="{{ customer.id }}" 
+                                    data-first-name="{{ customer.userid.first_name }}" 
+                                    data-last-name="{{ customer.userid.last_name }}" 
+                                    data-address="{{ customer.address }}" 
+                                    data-phone="{{ customer.phone }}"
+                                    data-approached="{{ customer.approched_by_staff|yesno:'yes,no' }}">
+                                {{ customer.userid.first_name }} {{ customer.userid.last_name }} - {{ customer.phone }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <form method="POST" action="" id="order-form">
+                {% csrf_token %}
+                <input type="hidden" name="is_existing_customer" id="is-existing-customer" value="no">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4 class="section-header">Customer Information</h4>
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" name="date" class="form-control" value="{{ current_date|date:'Y-m-d' }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Invoice No.</label>
+                            <input type="text" name="invoice_no" class="form-control" value="{{ invoice_no }}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>First Name</label>
+                            <input type="text" name="first_name" id="first-name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Last Name</label>
+                            <input type="text" name="last_name" id="last-name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Address</label>
+                            <input type="text" name="address" id="address" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone</label>
+                            <input type="text" name="phone" id="phone" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Approached by Staff</label>
+                            <select name="approached_by_staff" class="form-control" id="approached_by_staff" required onchange="toggleFieldStaffDropdown()">
+                                <option value="no">No</option>
+                                <option value="yes">Yes</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="field-staff-container" style="display: none;">
+                            <label>Field Staff</label>
+                            <select name="field_staff" class="form-control">
+                                <option value="">Select Field Staff</option>
+                                {% for staff in field_staff_list %}
+                                <option value="{{ staff.id }}">{{ staff.userid.first_name }} {{ staff.userid.last_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <input type="hidden" name="customer_id" id="customer-id" value="">
+                    </div>
+                    <div class="col-md-6">
+                        <h4 class="section-header">Product Information</h4>
+                        <div id="product-container">
+                            <div class="product-item" data-item-index="0">
+                                <div class="form-group">
+                                    <label>Product</label>
+                                    <select name="product[]" class="form-control product-select" required onchange="handleProductChange(this, 0)">
+                                        <option value="">Select a product</option>
+                                        {% for product in products %}
+                                        <option value="{{ product.id }}" data-category="{{ product.category.category_name|lower }}" data-price="{{ product.price }}">{{ product.product_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group quantity-field">
+                                    <label>Quantity</label>
+                                    <input type="number" name="quantity[]" class="form-control quantity-input" value="1" min="1" required oninput="calculateTotal()">
+                                </div>
+                                
+                                <div class="form-group shade-field" id="shade-field-0" style="display: none;">
+                                    <label>Shade</label>
+                                    <div class="color-picker-container">
+                                        <input type="hidden" name="shade[]" id="shade-input-0" class="shade-input">
+                                        <div class="color-options" id="color-options-0"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <button type="button" class="btn btn-success add-product">Add Product</button>
+                                    <button type="button" class="btn btn-danger remove-product" style="display:none;">Remove</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group mt-3">
+                            <label>Total Amount</label>
+                            <input type="text" name="total_amount" id="total_amount" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-primary">Save and Print</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Initialize the form
+    document.addEventListener('DOMContentLoaded', function() {
+        calculateTotal();
+        
+        // Add event listener for adding new products
+        document.querySelector('.add-product').addEventListener('click', addProductItem);
+        
+        // Add event listener for removing products
+        document.addEventListener('click', function(event) {
+            if (event.target.classList.contains('remove-product')) {
+                removeProductItem(event.target);
+            }
+        });
+
+        // Customer registration status buttons
+        document.getElementById('customer-yes').addEventListener('click', function() {
+            toggleCustomerSection('yes');
+        });
+        
+        document.getElementById('customer-no').addEventListener('click', function() {
+            toggleCustomerSection('no');
+        });
+        
+        // Customer dropdown change handler
+        document.getElementById('customer-dropdown').addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            if (selectedOption.value) {
+                // Set the customer ID in the hidden field
+                document.getElementById('customer-id').value = selectedOption.value;
+                
+                // Fill the form with customer details
+                document.getElementById('first-name').value = selectedOption.dataset.firstName;
+                document.getElementById('last-name').value = selectedOption.dataset.lastName;
+                document.getElementById('address').value = selectedOption.dataset.address;
+                document.getElementById('phone').value = selectedOption.dataset.phone;
+                
+                // Set approached by staff value
+                document.getElementById('approached_by_staff').value = selectedOption.dataset.approached;
+                toggleFieldStaffDropdown();
+            } else {
+                clearCustomerFields();
+            }
+        });
+    });
+
+    function toggleCustomerSection(status) {
+        const existingSection = document.getElementById('existing-customer-section');
+        const isExistingCustomer = document.getElementById('is-existing-customer');
+        const yesButton = document.getElementById('customer-yes');
+        const noButton = document.getElementById('customer-no');
+        
+        // Update button styles
+        if (status === 'yes') {
+            yesButton.classList.add('active');
+            noButton.classList.remove('active');
+            existingSection.style.display = 'block';
+            isExistingCustomer.value = 'yes';
+            
+            // Make customer form fields readonly when existing customer is selected
+            document.querySelectorAll('#first-name, #last-name, #address, #phone').forEach(field => {
+                field.readOnly = true;
+            });
+        } else {
+            yesButton.classList.remove('active');
+            noButton.classList.add('active');
+            existingSection.style.display = 'none';
+            isExistingCustomer.value = 'no';
+            
+            // Make customer form fields editable when new customer is selected
+            document.querySelectorAll('#first-name, #last-name, #address, #phone').forEach(field => {
+                field.readOnly = false;
+            });
+            
+            clearCustomerFields();
+        }
+    }
+    
+    function clearCustomerFields() {
+        // Clear all customer related fields
+        document.getElementById('customer-id').value = '';
+        document.getElementById('first-name').value = '';
+        document.getElementById('last-name').value = '';
+        document.getElementById('address').value = '';
+        document.getElementById('phone').value = '';
+        document.getElementById('approached_by_staff').value = 'no';
+        toggleFieldStaffDropdown();
+    }
+
+    function toggleFieldStaffDropdown() {
+        const fieldStaffContainer = document.getElementById('field-staff-container');
+        const approachedByStaff = document.getElementById('approached_by_staff').value;
+        fieldStaffContainer.style.display = approachedByStaff === 'yes' ? 'block' : 'none';
+    }
+
+    function handleProductChange(selectElement, index) {
+        const productId = selectElement.value;
+        const shadeField = document.getElementById(`shade-field-${index}`);
+        const colorOptions = document.getElementById(`color-options-${index}`);
+        const shadeInput = document.getElementById(`shade-input-${index}`);
+        
+        // Reset color options
+        colorOptions.innerHTML = '';
+        shadeInput.value = '';
+        
+        if (productId) {
+            // Fetch the product details including available shades
+            fetch(`/api/product/${productId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.available_shades && Object.keys(data.available_shades).length > 0) {
+                        // Show the shade field
+                        shadeField.style.display = 'block';
+                        
+                        // Create color swatches for each available shade
+                        Object.keys(data.available_shades).forEach(colorCode => {
+                            const quantity = data.available_shades[colorCode];
+                            if (quantity > 0) {
+                                const colorSwatch = document.createElement('div');
+                                colorSwatch.className = 'color-swatch';
+                                colorSwatch.style.backgroundColor = colorCode;
+                                colorSwatch.dataset.color = colorCode;
+                                colorSwatch.dataset.quantity = quantity;
+                                colorSwatch.title = `${colorCode} (${quantity} available)`;
+                                
+                                // Add click event to select color
+                                colorSwatch.addEventListener('click', function() {
+                                    // Remove selected class from all swatches in this container
+                                    const allSwatches = colorOptions.querySelectorAll('.color-swatch');
+                                    allSwatches.forEach(swatch => swatch.classList.remove('selected'));
+                                    
+                                    // Add selected class to this swatch
+                                    this.classList.add('selected');
+                                    
+                                    // Set the value in the hidden input
+                                    shadeInput.value = this.dataset.color;
+                                });
+                                
+                                colorOptions.appendChild(colorSwatch);
+                            }
+                        });
+                    } else {
+                        // Hide the shade field if no shades available
+                        shadeField.style.display = 'none';
+                    }
+                    
+                    calculateTotal();
+                })
+                .catch(error => {
+                    console.error('Error fetching product details:', error);
+                    shadeField.style.display = 'none';
+                });
+        } else {
+            // Hide the shade field if no product selected
+            shadeField.style.display = 'none';
+        }
+        
+        calculateTotal();
+    }
+
+    function calculateTotal() {
+        let totalAmount = 0;
+        document.querySelectorAll('.product-item').forEach((item) => {
+            const productSelect = item.querySelector('.product-select');
+            const quantityInput = item.querySelector('.quantity-input');
+            
+            if (productSelect.selectedIndex > 0) {
+                const selectedOption = productSelect.options[productSelect.selectedIndex];
+                const productPrice = parseFloat(selectedOption.getAttribute('data-price')) || 0;
+                const quantity = parseInt(quantityInput.value) || 1;
+                totalAmount += productPrice * quantity;
+            }
+        });
+        document.getElementById('total_amount').value = totalAmount.toFixed(2);
+    }
+
+    function addProductItem() {
+        const container = document.getElementById('product-container');
+        const items = container.querySelectorAll('.product-item');
+        const newIndex = items.length;
+        
+        const newItem = document.createElement('div');
+        newItem.className = 'product-item';
+        newItem.dataset.itemIndex = newIndex;
+        
+        newItem.innerHTML = `
+            <div class="form-group">
+                <label>Product</label>
+                <select name="product[]" class="form-control product-select" required onchange="handleProductChange(this, ${newIndex})">
+                    <option value="">Select a product</option>
+                    ${document.querySelector('.product-select').innerHTML.split('<option value="">Select a product</option>')[1]}
+                </select>
+            </div>
+            
+            <div class="form-group quantity-field">
+                <label>Quantity</label>
+                <input type="number" name="quantity[]" class="form-control quantity-input" value="1" min="1" required oninput="calculateTotal()">
+            </div>
+            
+            <div class="form-group shade-field" id="shade-field-${newIndex}" style="display: none;">
+                <label>Shade</label>
+                <div class="color-picker-container">
+                    <input type="hidden" name="shade[]" id="shade-input-${newIndex}" class="shade-input">
+                    <div class="color-options" id="color-options-${newIndex}"></div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <button type="button" class="btn btn-success add-product">Add Product</button>
+                <button type="button" class="btn btn-danger remove-product">Remove</button>
+            </div>
+        `;
+        
+        container.appendChild(newItem);
+        
+        // Hide the "Add Product" button on previous items
+        const addButtons = container.querySelectorAll('.add-product');
+        for (let i = 0; i < addButtons.length - 1; i++) {
+            addButtons[i].style.display = 'none';
+        }
+        
+        // Show all remove buttons
+        const removeButtons = container.querySelectorAll('.remove-product');
+        for (let button of removeButtons) {
+            button.style.display = 'inline-block';
+        }
+        
+        // Add event listener for the new add button
+        newItem.querySelector('.add-product').addEventListener('click', addProductItem);
+    }
+
+    function removeProductItem(button) {
+        const container = document.getElementById('product-container');
+        const items = container.querySelectorAll('.product-item');
+        
+        if (items.length > 1) {
+            const item = button.closest('.product-item');
+            item.remove();
+            
+            // Show the "Add Product" button on the last item
+            const addButtons = container.querySelectorAll('.add-product');
+            addButtons[addButtons.length - 1].style.display = 'inline-block';
+            
+            // Hide the remove button if only one item remains
+            if (items.length <= 2) {
+                container.querySelector('.remove-product').style.display = 'none';
+            }
+            
+            // Recalculate the total
+            calculateTotal();
+        }
+    }
+</script>
+
+<style>
+    .container { max-width: 1200px; }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { font-weight: bold; margin-bottom: 5px; display: block; }
+    .form-control { padding: 8px; border-radius: 5px; width: 100%; }
+    .btn { padding: 8px 15px; border-radius: 5px; margin-right: 5px; }
+    .btn-group .btn { width: 100px; }
+    .btn-group .btn.active { background-color: #007bff; color: white; }
+    .order-card { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .product-item { border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 15px; }
+    .product-item:last-child { border-bottom: none; }
+    
+    /* Color picker styles */
+    .color-picker-container { margin-top: 5px; }
+    .color-options { display: flex; flex-wrap: wrap; gap: 10px; }
+    .color-swatch {
+        width: 30px;
+        height: 30px;
+        border-radius: 4px;
+        cursor: pointer;
+        border: 2px solid #ddd;
+        transition: transform 0.2s, border-color 0.2s;
+    }
+    .color-swatch:hover {
+        transform: scale(1.1);
+    }
+    .color-swatch.selected {
+        border: 2px solid #000;
+        box-shadow: 0 0 5px rgba(0,0,0,0.5);
+    }
+</style>
+{% endblock %}

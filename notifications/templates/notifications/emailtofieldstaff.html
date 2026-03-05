@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .header {
+            background-color: #2196F3;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+        }
+        .content {
+            padding: 20px;
+        }
+        .footer {
+            background-color: #f1f1f1;
+            padding: 10px;
+            text-align: center;
+            border-radius: 0 0 5px 5px;
+        }
+        .button {
+            background-color: #2196F3;
+            color: white;
+            padding: 10px 15px;
+            text-decoration: none;
+            display: inline-block;
+            border-radius: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table td, table th {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>New Delivery Assignment</h2>
+        </div>
+        <div class="content">
+            <p>Dear {{ field_staff.userid.username }},</p>
+            <p>You have been assigned a new order for delivery.</p>
+            
+            <h3>Delivery Details:</h3>
+            <table>
+                <tr>
+                    <td><strong>Order ID:</strong></td>
+                    <td>#{{ order.id }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Customer:</strong></td>
+                    <td>{{ order.customer.userid.username }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Delivery Address:</strong></td>
+                    <td>{{ order.customer.address }}, {{ order.customer.city }}, {{ order.customer.state }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Contact Phone:</strong></td>
+                    <td>{{ order.customer.phone }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Expected Delivery Date:</strong></td>
+                    <td>{{ delivery_date }}</td>
+                </tr>
+            </table>
+            
+            <p>Please log in to your account to view more details about this delivery assignment.</p>
+            
+            <p style="text-align: center; margin-top: 20px;">
+                <a href="{{ order_url }}" class="button">View Delivery Details</a>
+            </p>
+        </div>
+        <div class="footer">
+            <p>&copy; {{ current_year }} ShadeStore. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

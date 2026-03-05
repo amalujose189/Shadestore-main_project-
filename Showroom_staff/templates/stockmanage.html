@@ -1,0 +1,240 @@
+{% extends 'showroomstaff_dash.html' %}
+
+{% block content %}
+<style>
+    .inventory-container {
+        background-color: #f8e6ff;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        max-width: 1200px;
+        margin: 20px auto;
+    }
+
+    .inventory-header {
+        color: #1a0033;
+        font-size: 32px;
+        font-weight: bold;
+        margin-bottom: 25px;
+        border-bottom: 3px solid #9966cc;
+        padding-bottom: 10px;
+        text-align: center;
+    }
+
+    .add-product-link {
+        display: block;
+        text-align: center;
+        background-color: #6a0dad;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: bold;
+        margin-bottom: 20px;
+        width: 200px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .add-product-link:hover {
+        background-color: #9932cc;
+    }
+
+    .filter-container {
+        background-color: #ffffff;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 25px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .form-group {
+        flex: 1;
+        min-width: 250px;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 5px;
+        color: #333;
+        font-weight: 600;
+    }
+
+    .form-input, .form-select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 16px;
+    }
+
+    .filter-button {
+        background-color: #0066ff;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    
+    .filter-button:hover {
+        background-color: #0052cc;
+    }
+
+    .inventory-table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: #ffffff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .inventory-table th {
+        background-color: #333;
+        color: white;
+        padding: 12px;
+        text-align: left;
+    }
+
+    .inventory-table tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    .inventory-table td {
+        padding: 12px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .badge-danger {
+        background-color: #ff4d4d;
+        color: white;
+       
+    }
+    
+    
+    .badge-warning {
+        background-color: #ffcc00;
+        color: #333;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+    }
+    
+    .action-button {
+        padding: 8px 15px;
+        border: none;
+        border-radius: 5px;
+        font-size: 14px;
+        cursor: pointer;
+        text-decoration: none;
+        font-weight: bold;
+        color: white;
+        text-align: center;
+    }
+    
+    .action-button.update {
+        background-color: #28a745;
+    }
+    
+    .action-button.view {
+        background-color: #007bff;
+    }
+    
+    .action-button:hover {
+        opacity: 0.9;
+    }
+
+    .empty-message {
+        text-align: center;
+        padding: 30px;
+        font-style: italic;
+        color: #666;
+    }
+</style>
+
+<div class="inventory-container">
+    <h1 class="inventory-header">Inventory Management</h1>
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        {% if 'inventory' in message.extra_tags or not message.extra_tags %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
+    <a href="{% url 'add_product' %}" class="add-product-link">Add New Product</a>
+    
+    <form method="get" action="">
+        <div class="filter-container">
+            <div class="form-group">
+                <label for="search" class="form-label">Search Products</label>
+                <input type="text" id="search" name="search" class="form-input" placeholder="Enter product name" value="{{ request.GET.search }}">
+            </div>
+            
+            <div class="form-group">
+                <label for="category" class="form-label">Category</label>
+                <select id="category" name="category" class="form-select">
+                    <option value="">All Categories</option>
+                    {% for category in categories %}
+                    <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:"i" %}selected{% endif %}>{{ category.category_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="stock" class="form-label">Stock Status</label>
+                <select id="stock" name="stock" class="form-select">
+                    <option value="">All</option>
+                    <option value="low" {% if request.GET.stock == 'low' %}selected{% endif %}>Low Stock</option>
+                    <option value="out" {% if request.GET.stock == 'out' %}selected{% endif %}>Out of Stock</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="filter-button">Filter</button>
+        </div>
+    </form>
+    
+    <table class="inventory-table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Available Stock</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr>
+                <td>{{ product.product_name }}</td>
+                <td>{{ product.category.category_name }}</td>
+                <td>₹{{ product.price }}</td>
+                <td>{% if product.total_stock == 0 %}<span class="badge-danger">Out of Stock</span>{% elif product.total_stock < 5 %}<span class="badge-warning">Low Stock ({{ product.total_stock }})</span>{% else %}{{ product.total_stock }}{% endif %}</td>
+                <td class="action-buttons">
+                    <a href="{% url 'update_inventory' product.id %}" class="action-button update">Update Stock</a>
+                    <a href="{% url 'view_product_details' product.id %}" class="action-button view">View</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="empty-message">No products found</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

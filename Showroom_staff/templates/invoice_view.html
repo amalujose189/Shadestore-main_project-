@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice - {{ invoice_no }}</title>
+    <style>
+        /* General styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        
+        /* Invoice container */
+        .invoice-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 30px;
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border: 1px solid #ddd;
+            position: relative;
+        }
+        
+        /* Invoice header */
+        .invoice-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .invoice-header h2 {
+            margin: 0 0 10px 0;
+            font-size: 28px;
+            color: #333;
+        }
+        
+        .timestamp {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 12px;
+            color: #777;
+        }
+        
+        /* Invoice details */
+        .invoice-details {
+            margin-bottom: 30px;
+        }
+        
+        .invoice-details p {
+            margin: 8px 0;
+            line-height: 1.5;
+        }
+        
+        /* Table styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #f8f8f8;
+            font-weight: bold;
+        }
+        
+        /* Total amount */
+        .total {
+            text-align: right;
+            font-weight: bold;
+            font-size: 18px;
+            margin: 20px 0;
+            padding-top: 10px;
+            padding-right: 12px; /* Added padding for alignment with table */
+            border-top: 2px solid #f0f0f0;
+            clear: both;
+        }
+        
+        /* Print button */
+        .print-btn {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .print-btn a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        
+        .print-btn a:hover {
+            background-color: #45a049;
+        }
+        
+        /* Customer info section */
+        .customer-info {
+            margin-bottom: 20px;
+        }
+        
+        .customer-info p {
+            margin: 5px 0;
+        }
+        
+        /* Hide any footer URLs and page info */
+        .footer-url, #footer-url, .page-info {
+            display: none !important;
+        }
+        
+        /* Completely remove any footer elements */
+        html {
+            position: relative;
+            min-height: 100%;
+        }
+        
+        body::after {
+            content: none !important;
+        }
+        
+        /* Print-specific styles */
+        @media print {
+            body {
+                background-color: #ffffff;
+            }
+            
+            .invoice-container {
+                width: 100%;
+                max-width: none;
+                margin: 0;
+                padding: 15px;
+                box-shadow: none;
+                border: none;
+            }
+            
+            .print-btn {
+                display: none;
+            }
+            
+            table {
+                page-break-inside: avoid;
+                margin-bottom: 20px;
+            }
+            
+            /* Ensure page breaks don't occur in the middle of content */
+            .invoice-header, .invoice-details, .total {
+                page-break-inside: avoid;
+            }
+            
+            /* Hide footer when printing */
+            @page {
+                margin-bottom: 0;
+            }
+            
+            /* Remove any footer content */
+            body::after {
+                content: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <!-- Optional timestamp in the corner - removed time formatting -->
+        <div class="timestamp">
+            {{ invoice_date|date:"m/d/Y" }}
+        </div>
+        
+        <div class="invoice-header">
+            <h2>Invoice</h2>
+            <p><strong>Invoice No:</strong> {{ invoice_no }}</p>
+            <p><strong>Date:</strong> {{ invoice_date }}</p>
+        </div>
+        
+        <div class="customer-info">
+            <p><strong>Customer:</strong> {{ customer.userid.first_name }} {{ customer.userid.last_name }}</p>
+            <p><strong>Address:</strong> {{ customer.address }}</p>
+            <p><strong>Phone:</strong> {{ customer.phone }}</p>
+            {% if field_staff %}
+                <p><strong>Field Staff:</strong> {{ field_staff.userid.first_name }} {{ field_staff.userid.last_name }}</p>
+            {% endif %}
+        </div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Color</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in order_items %}
+                <tr>
+                    <td>{{item.product.product_name}}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.color }}</td>
+                    <td>${{ item.subtotal }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <div class="total">Total Amount: ${{ total_amount|floatformat:2 }}</div>
+        
+        {% if show_print_button %}
+        <div class="print-btn">
+            <a href="?print=true" onclick="window.print(); return false;">Print Invoice</a>
+        </div>
+        {% endif %}
+    </div>
+    
+    <script>
+        // If this page was loaded with the print parameter, trigger print automatically
+        window.onload = function() {
+            if (window.location.search.includes('print=true')) {
+                setTimeout(function() {
+                    window.print();
+                }, 500);
+            }
+            
+            // Remove any elements containing the URL from the DOM
+            var allElements = document.body.getElementsByTagName('*');
+            for (var i = 0; i < allElements.length; i++) {
+                var element = allElements[i];
+                if (element.innerHTML && element.innerHTML.indexOf('127.0.0.1:8000/Showroom_staff/invoice') !== -1) {
+                    element.parentNode.removeChild(element);
+                }
+            }
+            
+            // Create a style element to force hide any potential footer
+            var style = document.createElement('style');
+            style.innerHTML = `
+                body::after { content: none !important; display: none !important; }
+                [id*="footer"], [class*="footer"], *[id*="footer"], *[class*="footer"] { display: none !important; }
+                *:after { content: none !important; }
+            `;
+            document.head.appendChild(style);
+        };
+    </script>
+</body>
+</html>

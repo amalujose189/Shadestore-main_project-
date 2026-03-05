@@ -1,0 +1,158 @@
+{% extends 'main.html' %}
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <!-- Order Summary -->
+       <!-- Order Summary -->
+                <div class="col-md-8">
+                    <div class="card mb-3">
+                        <div class="card-header bg-white">
+                            <h5>Order #{{ order.id }}</h5>
+                        </div>
+                        <div class="card-body">
+                            {% with order.items.first as item %}
+                                <h6>{{ item.product.product_name }}</h6>
+                                <p><strong>Seller:</strong> {{ item.product.seller|default:"N/A" }}</p>
+                                <h4 class="text-primary">₹{{ order.total_amount }}</h4>
+                            {% endwith %}
+                        </div>
+                    </div>
+
+
+            <!-- Order Status -->
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5>Order Status</h5>
+                    <ul class="list-group">
+                        <li class="list-group-item">
+                            ✅ Order Received - {{ order.created_at|date:"D, M d" }}
+                        </li>
+                        {% if order.status == "shipped" or order.status == "delivered" %}
+                        <li class="list-group-item">
+                            🚚 Shipped - {{ order.shipped_date|default:"Pending"|date:"D, M d" }}
+                        </li>
+                        {% endif %}
+                        {% if order.status == "delivered" %}
+                        <li class="list-group-item">
+                            📦 Delivered - {{ order.delivery_date|date:"D, M d" }}
+                        </li>
+                        {% endif %}
+                        {% if order.status == "cancelled" %}
+                        <li class="list-group-item text-danger">
+                            ❌ Cancelled - {{ order.cancelled_at|default:order.updated_at|date:"D, M d" }}
+                        </li>
+                        <p class="text-danger mt-2">Shipment is cancelled</p>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shipping Details & Price Breakdown -->
+        <div class="col-md-4">
+            <!-- Shipping Details -->
+            <div class="card mb-3">
+                <div class="card-header bg-white">
+                    <h5>Shipping Details</h5>
+                </div>
+                <div class="card-body">
+                   <p><strong>{{ order.user.get_full_name }}</strong></p>
+                    <!--<p>{{ order.shipping_address|default:"No address available" }}</p>
+                    <p><strong>Phone:</strong> {{ order.customer.phone|default:"Not Provided" }}</p>
+                    {# order.user.phone is usually not default in Django's User model unless extended #}-->
+                {% if order.customer %}
+                    <p>{{ order.customer.address }}, {{ order.customer.city }}, {{ order.customer.state }}</p>
+                    <p><strong>Phone:</strong> {{ order.customer.phone }}</p>
+                {% else %}
+                    <p>No customer details available.</p>
+                {% endif %}
+                </div>
+            </div>
+            
+   
+
+            <!-- Price Details -->
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5>Price Details</h5>
+                </div>
+                <div class="card-body">
+                    {% with order.items.first as item %}
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>List Price:</span> 
+                            <span>
+                                ₹{{ item.product.original_price|default:item.product.price }}
+                            </span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Discount:</span> 
+                            <span class="text-success">-₹{{ order.discount|default:0 }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <strong>Total:</strong> 
+                            <strong>₹{{ order.total_amount }}</strong>
+                        </li>
+                    </ul>
+                    {% endwith %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat or Help Section -->
+    <div class="text-center mt-3">
+        <button class="btn btn-outline-primary">💬 Chat with Us</button>
+        <button class="btn btn-outline-secondary">📤 Send Order Details</button>
+    </div>
+</div>
+
+<style>
+.card {
+    border: 1px solid #f27474;
+    border-radius: 8px;
+    background-color: #eafdf9;
+    padding: 20px;
+    margin-bottom: 15px;
+}
+
+.card-header {
+    font-weight: bold;
+    font-size: 18px;
+    background-color: #ea9595;
+    padding: 20px;
+    border-bottom: 1px solid #073673;
+}
+
+.text-primary {
+    color: #007bff;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.btn {
+    padding: 8px 10px;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    margin-right: 10px;
+    border-radius: 4px;
+}
+
+.btn-primary {
+    background: #007bff;
+    color: white;
+}
+
+.btn-secondary {
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+}
+
+.navbar {
+    height: auto !important;
+    padding: 10px 20px !important;
+}
+</style>
+
+{% endblock %}

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>New Order Assignment</title>
+</head>
+<body>
+    <h2>New Order Assignment</h2>
+    <p>Hello {{ field_staff.userid.get_full_name }},</p>
+    
+    <p>You have been assigned to handle Order #{{ order.id }} with the following details:</p>
+    
+    <h3>Customer Information</h3>
+    <ul>
+        <li><strong>Name:</strong> {{ customer.userid.get_full_name }}</li>
+        <li><strong>Phone:</strong> {{ customer_phone }}</li>
+        <li><strong>Address:</strong> {{ delivery_address }}</li>
+    </ul>
+    
+    <h3>Order Details</h3>
+    <ul>
+        {% for item in order_items %}
+        <li>{{ item.quantity }} x {{ item.product.product_name }} - ₹{{ item.subtotal }}</li>
+        {% endfor %}
+    </ul>
+    <p><strong>Total Amount:</strong> ₹{{ total_amount }}</p>
+    
+    <p>Please contact the customer to arrange for delivery and installation as needed.</p>
+    
+    <p>Thank you,<br>
+    Your Paint Shop Team</p>
+</body>
+</html>

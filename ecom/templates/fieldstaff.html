@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="dashboard-welcome">
+    <h1>Welcome, {{ user.first_name }}!</h1>
+    <p>Here’s your activity overview for today.</p>
+</div>
+
+<div class="dashboard-cards">
+    <div class="card">
+        <i class="fas fa-user-edit card-icon"></i>
+        <h3>Update Profile</h3>
+        <a href="{% url 'update_profile' %}" class="btn">Update Now</a>
+    </div>
+    <div class="card">
+        <i class="fas fa-map-marker-alt card-icon"></i>
+        <h3>Add Site Visit</h3>
+        <a href="{% url 'add_site_visit' %}" class="btn">Add Visit</a>
+    </div>
+    <div class="card">
+        <i class="fas fa-map-marker-alt card-icon"></i>
+        <h3>view site list</h3>
+        <a href="{% url '' %}" class="btn">Add Visit</a>
+    </div>
+    <div class="card">
+        <i class="fas fa-truck card-icon"></i>
+        <h3>View Deliveries</h3>
+        <a href="{% url 'view_deliveries' %}" class="btn">View Records</a>
+    </div>
+    <div class="card">
+        <i class="fas fa-wallet card-icon"></i>
+        <h3>Salary Details</h3>
+        <a href="{% url 'salary_details' %}" class="btn">View Details</a>
+    </div>
+</div>
+{% endblock %}
